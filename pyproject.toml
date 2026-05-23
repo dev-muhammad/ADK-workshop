@@ -1,0 +1,25 @@
+[project]
+name = "adk-workshop"
+version = "0.1.0"
+description = "Materials for the 'Build your first AI agent!' workshop using Google ADK"
+requires-python = ">=3.10"
+dependencies = [
+    "google-adk>=1.0.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "jupyter>=1.0.0",
+]
+eval = [
+    "pandas>=2.0.0",
+    "tabulate>=0.9.0",
+    "rouge-score>=0.1.2",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["checkpoints"]

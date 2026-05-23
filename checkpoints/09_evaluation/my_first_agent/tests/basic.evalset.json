@@ -1,0 +1,72 @@
+{
+  "eval_set_id": "basic",
+  "name": "Базовый набор: погода и время",
+  "description": "Минимальный evalset на 2 кейса для weather_time_agent.",
+  "eval_cases": [
+    {
+      "eval_id": "weather_ny",
+      "conversation": [
+        {
+          "invocation_id": "1",
+          "user_content": {
+            "parts": [{"text": "Какая погода в Нью-Йорке?"}],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [{"text": "В Нью-Йорке солнечно, 25°C."}],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "get_weather",
+                "args": {"city": "New York"}
+              }
+            ],
+            "intermediate_responses": []
+          },
+          "creation_timestamp": 0.0
+        }
+      ],
+      "session_input": {
+        "app_name": "test_app",
+        "user_id": "test_user",
+        "state": {}
+      },
+      "creation_timestamp": 0.0
+    },
+    {
+      "eval_id": "time_london",
+      "conversation": [
+        {
+          "invocation_id": "1",
+          "user_content": {
+            "parts": [{"text": "Который сейчас час в Лондоне?"}],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [{"text": "Текущее время в Лондоне."}],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "get_current_time",
+                "args": {"city": "London"}
+              }
+            ],
+            "intermediate_responses": []
+          },
+          "creation_timestamp": 0.0
+        }
+      ],
+      "session_input": {
+        "app_name": "test_app",
+        "user_id": "test_user",
+        "state": {}
+      },
+      "creation_timestamp": 0.0
+    }
+  ],
+  "creation_timestamp": 0.0
+}
