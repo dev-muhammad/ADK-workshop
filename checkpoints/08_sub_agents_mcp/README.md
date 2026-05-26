@@ -19,8 +19,23 @@
 
 **Два типа multi-agent:**
 
-1. **LLM-coordinator** (наш пример) — координатор сам выбирает, кому делегировать, на основе `description` sub-агентов. Гибко, но недетерминированно.
-2. **Workflow agents** — `SequentialAgent`, `ParallelAgent`, `LoopAgent` — детерминированный порядок без LLM на координации. Дешевле и предсказуемее.
+1. **AgentTool pattern** (наш пример) — sub-агенты оборачиваются в `AgentTool` и передаются координатору как обычные tools. Координатор вызывает их через function-calling, получает текстовый результат.
+2. **`sub_agents=[...]` handoff** — классический «передача хода». Координатор делает `transfer_to_agent("researcher")`, контекст переключается на sub-агента, потом возвращается. Гибче, но имеет важное ограничение (см. ниже).
+3. **Workflow agents** — `SequentialAgent`, `ParallelAgent`, `LoopAgent` — детерминированный порядок без LLM на координации. Дешевле и предсказуемее.
+
+### ⚠️ Почему здесь AgentTool, а не sub_agents
+
+Gemini API **не разрешает** смешивать **built-in tools** (`google_search`, `code_execution`) с обычным function-calling в одном агенте. А при `sub_agents=[...]` ADK автоматически инжектит в sub-агента функцию `transfer_to_agent` — что вызывает ошибку:
+
+```
+400 INVALID_ARGUMENT: Please enable
+tool_config.include_server_side_tool_invocations to use
+Built-in tools with Function calling.
+```
+
+`AgentTool` обходит проблему: sub-агент запускается **в собственном sub-runner'е**, изолированно — никакого `transfer_to_agent` ему не добавляют, `google_search` живёт один.
+
+**Когда `sub_agents=[...]` ОК:** если у sub-агентов нет built-in tools (только LLM или function tools).
 
 **Что такое MCP (Model Context Protocol)?**
 Открытый стандарт для подключения внешних tools и данных к AI-агентам — как «USB-C для AI». Один и тот же MCP-сервер можно подключить к ADK, Claude Desktop, Cursor, любому совместимому клиенту.
@@ -62,11 +77,11 @@ adk web
 Попробуйте: «Напиши краткую статью про Python decorators.»
 
 В dev UI откройте вкладку **Events** — увидите:
-1. `coordinator` вызывает делегирование к `researcher`
-2. `researcher` ищет факты (если подключен `google_search`)
-3. `coordinator` делегирует к `writer`
-4. `writer` собирает финальный текст
-5. Возврат к `coordinator` и финальный ответ пользователю
+1. `coordinator` вызывает **tool** `researcher(request=...)` (это AgentTool, не transfer)
+2. Внутри researcher: вызов `google_search`, формирование списка фактов
+3. Результат AgentTool возвращается в coordinator как обычный function-response
+4. `coordinator` вызывает **tool** `writer(facts=...)` — он пишет статью
+5. `coordinator` возвращает финальную статью пользователю
 
 ## Что пробовать
 

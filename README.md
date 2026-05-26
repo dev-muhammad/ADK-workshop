@@ -2,6 +2,12 @@
 
 Материалы воркшопа по Google ADK (Agent Development Kit) на Python — полный цикл разработки агента: от первого `Hello, Agent!` до streaming, callbacks, evaluation и деплоя.
 
+## 📅 Событие
+
+**Workshop: Exploring Google AI Studio & ADK** — организует **GDG Khujand**.
+
+👉 [Регистрация и детали на GDG Community](https://gdg.community.dev/events/details/google-gdg-khujand-presents-workshop-exploring-google-ai-studio-amp-adk/)
+
 ## Автор
 
 **Мухаммад Абдугафаров** — AI Product Engineer, Founder of [Lookona Labs](https://lookona.com).
@@ -17,12 +23,18 @@
 - Telegram: [@muhammad_babolo](https://t.me/muhammad_babolo)
 - Instagram: [@muhammad.babolo](https://instagram.com/muhammad.babolo)
 
+## 🎤 Презентация воркшопа
+
+**Google Slides (рекомендуется для просмотра и шеринга):**
+👉 [docs.google.com/presentation/d/14VwUGWvSDmtGe7Y-PQBkPfETlWek4qiruJYJARlvvV4](https://docs.google.com/presentation/d/14VwUGWvSDmtGe7Y-PQBkPfETlWek4qiruJYJARlvvV4/edit?usp=sharing)
+
+
 ## Что в папке
 
 | Файл / папка                   | Что это                                                                                  |
 |--------------------------------|------------------------------------------------------------------------------------------|
 | `workshop_plan.md`             | Подробный план воркшопа на 2 ч 30 мин (11 блоков) — для спикера                          |
-| `slides.pptx`                  | Презентация (16 слайдов) — для показа во время воркшопа                                  |
+| Слайды                         | См. [Google Slides](https://docs.google.com/presentation/d/14VwUGWvSDmtGe7Y-PQBkPfETlWek4qiruJYJARlvvV4/edit?usp=sharing) выше (исходник в pptx не коммитится) |
 | `workshop_notebook.ipynb`      | Colab/Jupyter ноутбук со всеми блоками — для самостоятельной работы                      |
 | `pyproject.toml`               | Зависимости проекта (для `uv`)                                                            |
 | `requirements.txt`             | То же для `pip` (если без `uv`)                                                          |
