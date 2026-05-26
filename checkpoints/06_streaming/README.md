@@ -1,67 +1,67 @@
 # Checkpoint 06 · Streaming (SSE)
 
-## Что нового в этом шаге
+## What's new in this step
 
-Включили **потоковую выдачу** ответа — токены приходят клиенту по мере генерации, а не одним блоком в конце. Это даёт классический «chat»-UX.
+We turn on **streamed output** — tokens arrive at the client as they're generated, not as one final blob. This is the classic "chat" UX.
 
-Изменили:
-- `agent.py` — поменяли инструкцию на «рассказчика», чтобы streaming был визуально заметен на длинных ответах.
-- Новый файл `streaming_demo.py` — показывает `RunConfig(streaming_mode=StreamingMode.SSE)`.
+Changes:
+- `agent.py` — instruction changed to "storyteller" so streaming is visually obvious on long answers.
+- New file `streaming_demo.py` — shows `RunConfig(streaming_mode=StreamingMode.SSE)`.
 
-## Теория
+## Theory
 
-**Streaming в ADK управляется не агентом, а runtime'ом.** Один и тот же агент может работать в любом из трёх режимов:
+**Streaming in ADK is controlled by the runtime, not the agent.** The same agent can run in any of three modes:
 
-| Режим                  | Что значит                                                                       | Когда использовать                                       |
-|------------------------|-----------------------------------------------------------------------------------|----------------------------------------------------------|
-| `StreamingMode.NONE`   | Без streaming, ответ возвращается целиком (default)                              | Batch-обработка, простые задачи                          |
-| `StreamingMode.SSE`    | Server-Sent Events — token-by-token односторонний поток от сервера к клиенту     | Чат-боты, ассистенты — улучшает UX                       |
-| `StreamingMode.BIDI`   | Bidirectional через Gemini Live API — двусторонний канал                         | Голос/видео в реальном времени, прерывания               |
+| Mode                   | What it means                                                                | When to use                                              |
+|------------------------|------------------------------------------------------------------------------|----------------------------------------------------------|
+| `StreamingMode.NONE`   | No streaming, response returned all at once (default)                       | Batch processing, simple tasks                           |
+| `StreamingMode.SSE`    | Server-Sent Events — token-by-token one-way stream from server to client   | Chatbots, assistants — improves UX                       |
+| `StreamingMode.BIDI`   | Bidirectional via Gemini Live API — two-way channel                          | Real-time voice/video, barge-in                          |
 
-**Что важно понимать:**
-- В SSE-режиме `runner.run_async()` всё равно `async for event in ...` — просто событий становится больше.
-- Промежуточные чанки помечены `event.partial = True`. Финальный event — `event.is_final_response() == True`.
-- `max_llm_calls` в `RunConfig` — обязательно для production: защита от бесконечного цикла, когда LLM «зацикливается» на инструментах.
+**Things to remember:**
+- In SSE mode `runner.run_async()` is still `async for event in ...` — just more events.
+- Intermediate chunks are flagged `event.partial = True`. The final event has `event.is_final_response() == True`.
+- `max_llm_calls` in `RunConfig` — mandatory for production: protects against infinite loops when the LLM "ping-pongs" on tool calls.
 
-**BIDI / Live API** — требует другой модели (`gemini-2.0-flash-live-001` и аналоги) и работает по WebSocket. В `adk web` есть кнопки микрофона и камеры — попробуйте на любом агенте с Live-моделью.
+**BIDI / Live API** — requires a different model (`gemini-2.0-flash-live-001` and friends) and runs over WebSocket. `adk web` has mic and camera buttons — try them on any agent with a Live model.
 
-## Структура
+## Structure
 
 ```
 06_streaming/
 ├── my_first_agent/
 │   ├── __init__.py
-│   ├── agent.py             ← агент-рассказчик (для красивой демонстрации)
+│   ├── agent.py             ← storyteller agent (good for visible streaming)
 │   └── .env.example
-└── streaming_demo.py        ← пример с StreamingMode.SSE
+└── streaming_demo.py        ← example with StreamingMode.SSE
 ```
 
-## Запуск
+## Running
 
-**Вариант A — dev UI (SSE по умолчанию):**
+**Option A — dev UI (SSE by default):**
 
 ```bash
 cd checkpoints/06_streaming
 adk web
 ```
 
-Попросите: «Расскажи длинную историю про кота-программиста.»
-Увидите, как текст появляется постепенно.
+Ask: "Tell me a long story about a coding cat."
+Watch the text appear progressively.
 
-**Вариант B — программно (видно сам код streaming):**
+**Option B — programmatic (you see the streaming code itself):**
 
 ```bash
 cd checkpoints/06_streaming
 cp my_first_agent/.env.example my_first_agent/.env
-# вписать GOOGLE_API_KEY
+# paste GOOGLE_API_KEY
 
 python streaming_demo.py
 ```
 
-Скрипт выводит ответ символ за символом с `flush=True` — увидите, как ответ «капает» в терминал.
+The script prints the response character by character with `flush=True` — you'll see it "drip" into the terminal.
 
-## Что пробовать
+## Things to try
 
-- Замените `StreamingMode.SSE` на `StreamingMode.NONE` и сравните — увидите, что ответ появляется только в конце.
-- Уменьшите `max_llm_calls` до 1 и спросите что-то требующее нескольких шагов — агент остановится, не закончив.
-- Если хотите попробовать BIDI/голос — поменяйте модель на `gemini-2.0-flash-live-001`, запустите `adk web` и нажмите кнопку микрофона. Перед запуском: `export SSL_CERT_FILE=$(python -m certifi)`.
+- Swap `StreamingMode.SSE` for `StreamingMode.NONE` and compare — you'll see the response only appears at the end.
+- Drop `max_llm_calls` to 1 and ask something that needs multiple steps — the agent will stop before finishing.
+- To try BIDI/voice — switch the model to `gemini-2.0-flash-live-001`, run `adk web`, and click the mic button. Before launching: `export SSL_CERT_FILE=$(python -m certifi)`.

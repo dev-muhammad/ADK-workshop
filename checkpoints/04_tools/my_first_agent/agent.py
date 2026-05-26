@@ -1,20 +1,20 @@
-"""Блок 4. Tools: function tools + built-in google_search.
+"""Block 4. Tools: function tools + built-in google_search.
 
-Демонстрирует два паттерна:
-  1. Свои функции как tools — get_weather, get_current_time
-  2. Встроенный tool google_search
+Demonstrates two patterns:
+  1. Your own functions as tools — get_weather, get_current_time
+  2. Built-in tool google_search
 
-ВАЖНО: type hints и docstring — это то, что увидит LLM. Пишите их аккуратно.
+IMPORTANT: type hints and docstrings are what the LLM sees. Write them carefully.
 
-Запуск:
+Run:
     cd checkpoints/04_tools
     adk web
 """
 
 import os
 
-# Имя модели читается из ADK_MODEL (см. .env / .env.example).
-# Fallback на gemini-3.1-flash-lite — у него самый щедрый free-tier RPD (500/день).
+# Model name is read from ADK_MODEL (see .env / .env.example).
+# Falls back to gemini-3.1-flash-lite — the most generous free-tier RPD (500/day).
 MODEL = os.getenv("ADK_MODEL", "gemini-3.1-flash-lite")
 
 import datetime
@@ -24,36 +24,36 @@ from google.adk.agents import Agent
 
 
 def get_weather(city: str) -> dict:
-    """Возвращает текущую погоду в указанном городе.
+    """Returns the current weather in the specified city.
 
     Args:
-        city: Название города на английском (например, "New York").
+        city: City name in English (e.g., "New York").
 
     Returns:
-        Словарь со статусом и отчётом либо сообщением об ошибке.
+        Dict with status and a report, or an error message.
     """
     fake_data = {
-        "new york": "В Нью-Йорке солнечно, 25°C.",
-        "london": "В Лондоне облачно, 14°C.",
-        "tashkent": "В Ташкенте ясно, 28°C.",
+        "new york": "It's sunny in New York, 25°C.",
+        "london": "It's cloudy in London, 14°C.",
+        "tashkent": "It's clear in Tashkent, 28°C.",
     }
     report = fake_data.get(city.lower())
     if report:
         return {"status": "success", "report": report}
     return {
         "status": "error",
-        "error_message": f"Нет данных по городу {city}.",
+        "error_message": f"No data for {city}.",
     }
 
 
 def get_current_time(city: str) -> dict:
-    """Возвращает текущее время в указанном городе.
+    """Returns the current time in the specified city.
 
     Args:
-        city: Название города на английском (например, "New York").
+        city: City name in English (e.g., "New York").
 
     Returns:
-        Словарь со статусом и отчётом либо сообщением об ошибке.
+        Dict with status and a report, or an error message.
     """
     tz_map = {
         "new york": "America/New_York",
@@ -64,7 +64,7 @@ def get_current_time(city: str) -> dict:
     if not tz_id:
         return {
             "status": "error",
-            "error_message": f"Нет таймзоны для {city}.",
+            "error_message": f"No timezone for {city}.",
         }
     now = datetime.datetime.now(ZoneInfo(tz_id))
     return {
@@ -73,29 +73,29 @@ def get_current_time(city: str) -> dict:
     }
 
 
-# Tools передаются обычным списком функций.
+# Tools are passed as a plain list of functions.
 root_agent = Agent(
     name="weather_time_agent",
     model=MODEL,
-    description="Агент, отвечающий на вопросы о погоде и времени в городе.",
+    description="Agent that answers questions about weather and time in a city.",
     instruction=(
-        "Ты — полезный ассистент. "
-        "Когда пользователь спрашивает о погоде или времени — используй инструменты. "
-        "Если города нет в данных — честно скажи об этом."
+        "You are a helpful assistant. "
+        "When the user asks about weather or time — use the tools. "
+        "If the city is not in the data — say so honestly."
     ),
     tools=[get_weather, get_current_time],
 )
 
 
-# --- Бонус: тот же агент, но со встроенным google_search ---
-# Раскомментируйте, чтобы попробовать grounding в Google.
+# --- Bonus: same agent but with built-in google_search ---
+# Uncomment to try grounding in Google.
 #
 # from google.adk.tools import google_search
 #
 # root_agent = Agent(
 #     name="search_agent",
-#     model="gemini-2.5-flash",
-#     description="Агент, ищущий ответы в Google.",
-#     instruction="Ты — эксперт-исследователь. Всегда опирайся на факты.",
+#     model=MODEL,
+#     description="Agent that searches answers in Google.",
+#     instruction="You are an expert researcher. Always rely on facts.",
 #     tools=[google_search],
 # )

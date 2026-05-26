@@ -1,99 +1,102 @@
-# ADK Workshop · «Build your first AI agent!»
+# ADK Workshop · "Build your first AI agent!"
 
-Материалы воркшопа по Google ADK (Agent Development Kit) на Python — полный цикл разработки агента: от первого `Hello, Agent!` до streaming, callbacks, evaluation и деплоя.
+**Languages:** 🇬🇧 English (you are here) · [🇷🇺 Русский](README.ru.md)
 
-## 📅 Событие
+Workshop materials for Google ADK (Agent Development Kit) with Python — the full agent development cycle: from a first `Hello, Agent!` to streaming, callbacks, evaluation, and deployment.
 
-**Workshop: Exploring Google AI Studio & ADK** — организует **GDG Khujand**.
+## 📅 Event
 
-👉 [Регистрация и детали на GDG Community](https://gdg.community.dev/events/details/google-gdg-khujand-presents-workshop-exploring-google-ai-studio-amp-adk/)
+**Workshop: Exploring Google AI Studio & ADK** — organized by **GDG Khujand**.
 
-## Автор
+👉 [Registration and details on GDG Community](https://gdg.community.dev/events/details/google-gdg-khujand-presents-workshop-exploring-google-ai-studio-amp-adk/)
 
-**Мухаммад Абдугафаров** — AI Product Engineer, Founder of [Lookona Labs](https://lookona.com).
+## Author
 
-- Сейчас — создаю AI-агентов для бизнеса.
-- До этого — 8 лет в разработке ПО.
-- На сцене — 3 года выступаю на Tech-митапах и организую их в рамках **GDG Khujand**.
+**Muhammad Abdugafarov** — AI Product Engineer, Founder of [Lookona Labs](https://lookona.com).
 
-**Связь:**
+- Now — building AI agents for businesses.
+- Before — 8 years in software development.
+- On stage — 3 years speaking at tech meetups and organizing them as part of **GDG Khujand**.
+
+**Connect:**
 - Website: [muhammads.site](https://muhammads.site)
 - LinkedIn: [muhammad-abdugafarov](https://www.linkedin.com/in/muhammad-abdugafarov/)
 - GitHub: [@dev-muhammad](https://github.com/dev-muhammad)
 - Telegram: [@muhammad_babolo](https://t.me/muhammad_babolo)
 - Instagram: [@muhammad.babolo](https://instagram.com/muhammad.babolo)
 
-## 🎤 Презентация воркшопа
+## 🎤 Workshop slides
 
-**Google Slides (рекомендуется для просмотра и шеринга):**
-👉 [docs.google.com/presentation/d/14VwUGWvSDmtGe7Y-PQBkPfETlWek4qiruJYJARlvvV4](https://docs.google.com/presentation/d/14VwUGWvSDmtGe7Y-PQBkPfETlWek4qiruJYJARlvvV4/edit?usp=sharing)
+**Google Slides (recommended for viewing and sharing):**
+👉 [docs.google.com/presentation/d/1UivU9RYczYTz6pb1b-q2OAP6EcZUi6Yi2W81f8A1WMw](https://docs.google.com/presentation/d/1UivU9RYczYTz6pb1b-q2OAP6EcZUi6Yi2W81f8A1WMw/edit?usp=sharing)
 
+Russian version: [docs.google.com/presentation/d/14VwUGWvSDmtGe7Y-PQBkPfETlWek4qiruJYJARlvvV4](https://docs.google.com/presentation/d/14VwUGWvSDmtGe7Y-PQBkPfETlWek4qiruJYJARlvvV4/edit?usp=sharing)
 
-## Что в папке
+## What's in this repo
 
-| Файл / папка                   | Что это                                                                                  |
-|--------------------------------|------------------------------------------------------------------------------------------|
-| `workshop_plan.md`             | Подробный план воркшопа на 2 ч 30 мин (11 блоков) — для спикера                          |
-| Слайды                         | См. [Google Slides](https://docs.google.com/presentation/d/14VwUGWvSDmtGe7Y-PQBkPfETlWek4qiruJYJARlvvV4/edit?usp=sharing) выше (исходник в pptx не коммитится) |
-| `workshop_notebook.ipynb`      | Colab/Jupyter ноутбук со всеми блоками — для самостоятельной работы                      |
-| `pyproject.toml`               | Зависимости проекта (для `uv`)                                                            |
-| `requirements.txt`             | То же для `pip` (если без `uv`)                                                          |
-| `verify_setup.py`              | Скрипт-самопроверка: импортирует все checkpoint'ы и (при наличии ключа) делает один вызов |
-| `checkpoints/`                 | 8 готовых ADK-проектов — по одному на блок                                               |
+| File / folder                  | What it is                                                                                |
+|--------------------------------|-------------------------------------------------------------------------------------------|
+| `workshop_plan.md`             | Detailed 2.5-hour workshop plan (11 blocks) — for the speaker (currently RU)              |
+| Slides                         | See [Google Slides](https://docs.google.com/presentation/d/1UivU9RYczYTz6pb1b-q2OAP6EcZUi6Yi2W81f8A1WMw/edit?usp=sharing) above (pptx source is not committed) |
+| `workshop_notebook.ipynb`      | Colab/Jupyter notebook covering all blocks — for self-paced study                         |
+| `pyproject.toml`               | Project dependencies (for `uv`)                                                            |
+| `requirements.txt`             | Same for `pip` (if not using `uv`)                                                        |
+| `verify_setup.py`              | Self-check script: imports every checkpoint and (with a key) makes a single live call     |
+| `checkpoints/`                 | 8 ready-to-run ADK projects — one per block                                               |
 
 ## Checkpoints
 
-В каждой папке — самостоятельный ADK-проект и свой `README.md` с теорией, что нового и как запустить.
+Each folder is a self-contained ADK project with its own `README.md` covering theory, what's new, and how to run.
 
-| Папка                          | Блок воркшопа              | Что демонстрирует                                                                |
-|--------------------------------|----------------------------|----------------------------------------------------------------------------------|
-| [`03_first_agent/`](checkpoints/03_first_agent/README.md)               | Блок 3                     | Минимальный агент: LLM + instruction                                             |
-| [`04_tools/`](checkpoints/04_tools/README.md)                           | Блок 4                     | Function tools (погода, время) + закомментирован `google_search`                 |
-| [`05_memory_sessions/`](checkpoints/05_memory_sessions/README.md)       | Блок 5                     | Session/State через `tool_context.state` + `run_session_demo.py`                 |
-| [`06_streaming/`](checkpoints/06_streaming/README.md)                   | Блок 6                     | `RunConfig(streaming_mode=StreamingMode.SSE)` + `streaming_demo.py`              |
-| [`07_callbacks/`](checkpoints/07_callbacks/README.md)                   | Блок 7                     | 4 callback'а: логирование, guardrail, нормализация args, подпись                 |
-| [`08_sub_agents_mcp/`](checkpoints/08_sub_agents_mcp/README.md)         | Блок 8                     | Multi-agent: coordinator → researcher + writer; пример MCP закомментирован       |
-| [`09_evaluation/`](checkpoints/09_evaluation/README.md)                 | Блок 9                     | `tests/` с `test_config.json`, `basic.evalset.json`, `test_agent.py` (pytest)    |
-| [`10_final/`](checkpoints/10_final/README.md)                           | Блок 10                    | Финальная версия — всё вместе                                                    |
+| Folder                         | Workshop block             | What it demonstrates                                                              |
+|--------------------------------|----------------------------|-----------------------------------------------------------------------------------|
+| [`03_first_agent/`](checkpoints/03_first_agent/README.md)               | Block 3                    | Minimal agent: LLM + instruction                                                  |
+| [`04_tools/`](checkpoints/04_tools/README.md)                           | Block 4                    | Function tools (weather, time) + commented-out `google_search`                    |
+| [`05_memory_sessions/`](checkpoints/05_memory_sessions/README.md)       | Block 5                    | Session/State via `tool_context.state` + `run_session_demo.py`                    |
+| [`06_streaming/`](checkpoints/06_streaming/README.md)                   | Block 6                    | `RunConfig(streaming_mode=StreamingMode.SSE)` + `streaming_demo.py`               |
+| [`07_callbacks/`](checkpoints/07_callbacks/README.md)                   | Block 7                    | 4 callbacks: logging, guardrail, arg normalization, signature                     |
+| [`08_sub_agents_mcp/`](checkpoints/08_sub_agents_mcp/README.md)         | Block 8                    | Multi-agent: coordinator → researcher + writer via AgentTool; MCP example         |
+| [`09_evaluation/`](checkpoints/09_evaluation/README.md)                 | Block 9                    | `tests/` with `test_config.json`, `basic.evalset.json`, `test_agent.py` (pytest)  |
+| [`10_final/`](checkpoints/10_final/README.md)                           | Block 10                   | Final version — everything combined                                               |
 
-## Быстрый старт через `uv`
+## Quick start with `uv`
 
-[uv](https://docs.astral.sh/uv/) — быстрый Python package manager, рекомендованный для этого воркшопа.
+[uv](https://docs.astral.sh/uv/) is a fast Python package manager — recommended for this workshop.
 
 ```bash
-# 1. Установить uv (если ещё нет)
+# 1. Install uv (one-time)
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# 2. Создать venv и установить зависимости
+# 2. Create a venv and install dependencies
 cd ADK-workshop
 uv venv --python 3.12
-source .venv/bin/activate           # Windows: .venv\Scripts\activate
+source .venv/bin/activate            # Windows: .venv\Scripts\activate
 uv pip install -e .
 
-# 3. (Опционально) с dev и eval инструментами
+# 3. (Optional) with dev and eval extras
 uv pip install -e ".[dev,eval]"
 
-# 4. API-ключ Gemini (бесплатно): https://aistudio.google.com/apikey
-# Способ A — через export в shell (один раз на всю сессию, удобно для воркшопа):
+# 4. Gemini API key (free): https://aistudio.google.com/apikey
+# Option A — export in shell (one-shot, convenient for a workshop):
 export GOOGLE_GENAI_USE_VERTEXAI=FALSE
-export GOOGLE_API_KEY="ваш_ключ_из_aistudio.google.com"
-export ADK_MODEL="gemini-3.1-flash-lite"   # опционально, см. ниже
-# Способ B — через .env в каждом checkpoint'е (см. ниже)
+export GOOGLE_API_KEY="your_key_from_aistudio.google.com"
+export ADK_MODEL="gemini-3.1-flash-lite"   # optional, see below
+# Option B — .env file in each checkpoint (see below)
 #
-# ВАЖНО: free-ключ имеет жёсткие лимиты (см. раздел «Лимиты free tier» ниже).
-# По умолчанию агенты используют gemini-3.1-flash-lite (500 запросов в день
-# вместо 20 у gemini-2.5-flash) — менять можно через ADK_MODEL.
+# IMPORTANT: the free key has strict daily quotas (see "Free tier limits" below).
+# Agents default to gemini-3.1-flash-lite (500 requests/day vs 20 for
+# gemini-2.5-flash) — switch with ADK_MODEL.
 
-# 5. Самопроверка
+# 5. Self-check
 python verify_setup.py
 
-# 6. Запуск первого агента
+# 6. Run the first agent
 cd checkpoints/03_first_agent
-cp my_first_agent/.env.example my_first_agent/.env  # вписать ключ
-adk web                              # dev UI на http://localhost:8000
+cp my_first_agent/.env.example my_first_agent/.env  # paste your key
+adk web                              # dev UI on http://localhost:8000
 ```
 
-Альтернатива без uv:
+Alternative without uv:
 
 ```bash
 python -m venv .venv
@@ -101,200 +104,200 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Конфигурация ключа и модели: `export` vs `.env`
+## Key & model configuration: `export` vs `.env`
 
-Есть **два способа** сказать ADK, какой API-ключ и какую модель использовать. Выбирайте удобный — оба работают, можно смешивать.
+There are **two ways** to tell ADK which API key and model to use. Pick whichever is more convenient — they can be mixed.
 
-### Способ A · `export` в shell (рекомендуется для воркшопа)
+### Option A · `export` in your shell (recommended for workshops)
 
-Установить переменные **один раз** на всю сессию — и они работают сразу во всех checkpoint'ах. Не нужно копировать `.env.example → .env` в каждой из 8 папок.
+Set the variables **once** for your whole shell session — they work across all 8 checkpoints. No need to copy `.env.example → .env` in each folder.
 
 ```bash
 # macOS / Linux (zsh / bash)
 export GOOGLE_GENAI_USE_VERTEXAI=FALSE
-export GOOGLE_API_KEY="ваш_ключ_из_aistudio.google.com"
-export ADK_MODEL="gemini-3.1-flash-lite"      # опционально
+export GOOGLE_API_KEY="your_key_from_aistudio.google.com"
+export ADK_MODEL="gemini-3.1-flash-lite"      # optional
 
 # Windows PowerShell
 $env:GOOGLE_GENAI_USE_VERTEXAI = "FALSE"
-$env:GOOGLE_API_KEY = "ваш_ключ"
+$env:GOOGLE_API_KEY = "your_key"
 $env:ADK_MODEL = "gemini-3.1-flash-lite"
 
 # Windows CMD
 set GOOGLE_GENAI_USE_VERTEXAI=FALSE
-set GOOGLE_API_KEY=ваш_ключ
+set GOOGLE_API_KEY=your_key
 set ADK_MODEL=gemini-3.1-flash-lite
 ```
 
-После этого любой checkpoint работает без `.env`:
+After this, any checkpoint works without a `.env`:
 
 ```bash
 cd checkpoints/03_first_agent
-adk web                  # подхватит ключ из shell
+adk web                  # picks up the key from your shell
 ```
 
-**Сделать постоянным** (чтобы не вводить каждый раз при открытии терминала):
+**Make it persistent** (so you don't re-type it on every terminal):
 
 ```bash
-# macOS (zsh) — добавить в ~/.zshrc
-echo 'export GOOGLE_API_KEY="ваш_ключ"' >> ~/.zshrc
+# macOS (zsh) — add to ~/.zshrc
+echo 'export GOOGLE_API_KEY="your_key"' >> ~/.zshrc
 echo 'export ADK_MODEL="gemini-3.1-flash-lite"' >> ~/.zshrc
 source ~/.zshrc
 
-# Linux (bash) — в ~/.bashrc
-echo 'export GOOGLE_API_KEY="ваш_ключ"' >> ~/.bashrc
+# Linux (bash) — add to ~/.bashrc
+echo 'export GOOGLE_API_KEY="your_key"' >> ~/.bashrc
 echo 'export ADK_MODEL="gemini-3.1-flash-lite"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-Для пер-проектной конфигурации без правки `~/.zshrc` удобно использовать [direnv](https://direnv.net/):
+For per-project config without touching `~/.zshrc`, use [direnv](https://direnv.net/):
 
 ```bash
-# В корне ADK-workshop:
-echo 'export GOOGLE_API_KEY="ваш_ключ"' > .envrc
+# In the ADK-workshop root:
+echo 'export GOOGLE_API_KEY="your_key"' > .envrc
 echo 'export ADK_MODEL="gemini-3.1-flash-lite"' >> .envrc
 direnv allow
 ```
 
-### Способ B · `.env` в каждом checkpoint'е
+### Option B · `.env` per checkpoint
 
-ADK автоматически подгружает `.env` из папки агента при запуске `adk web` / `adk run`. Полезно, если у разных checkpoint'ов должны быть разные настройки.
+ADK auto-loads `.env` from the agent folder when you run `adk web` / `adk run`. Useful when different checkpoints need different settings.
 
 ```bash
 cd checkpoints/03_first_agent/my_first_agent
 cp .env.example .env
-# отредактируйте .env, вставьте GOOGLE_API_KEY и, опционально, ADK_MODEL
+# edit .env, paste GOOGLE_API_KEY and, optionally, ADK_MODEL
 ```
 
-### Приоритет
+### Precedence
 
-Если переменная задана и в shell (через `export`), и в `.env` — **значение из shell `export` обычно побеждает**, так как оно уже в `os.environ` к моменту, когда `load_dotenv` пытается его установить. Если хотите чтобы `.env` всегда перезаписывал shell, используйте `load_dotenv(override=True)` (это уже не дефолт ADK, нужно делать вручную в собственном коде).
+If the same variable is set both in the shell (via `export`) and in `.env`, **the shell value usually wins** because it's already in `os.environ` by the time `load_dotenv` runs. To make `.env` always override the shell, you'd need `load_dotenv(override=True)` in your own code — not ADK's default.
 
-### Что выбрать
+### Which to pick
 
-| Сценарий                                         | Способ                                         |
-|--------------------------------------------------|------------------------------------------------|
-| Воркшоп, один общий ключ, быстро прогнать все 8 checkpoint'ов | **`export` в shell**                  |
-| Разработка нескольких независимых агентов        | `.env` в каждом                                |
-| Production / CI                                  | shell env (через secret manager)               |
-| Несколько проектов на машине                     | `direnv` + `.envrc`                            |
+| Scenario                                                       | Approach                              |
+|----------------------------------------------------------------|---------------------------------------|
+| Workshop, one shared key, run all 8 checkpoints quickly        | **`export` in shell**                 |
+| Developing several independent agents                          | `.env` per checkpoint                 |
+| Production / CI                                                | shell env (via a secret manager)      |
+| Multiple projects on the same machine                          | `direnv` + `.envrc`                   |
 
-## Как переключаться между checkpoint'ами
+## Moving between checkpoints
 
-Каждый checkpoint самостоятельный. Чтобы перейти к следующему:
+Every checkpoint is self-contained. To move to the next one:
 
 ```bash
 cd checkpoints/<N>_<name>
-cp my_first_agent/.env.example my_first_agent/.env  # вписать ключ
+cp my_first_agent/.env.example my_first_agent/.env  # paste your key
 adk web
 ```
 
-И смотрите соответствующий `README.md` внутри папки — там описано **что нового добавлено**, **теория** и **что попробовать**.
+Open the corresponding `README.md` inside the folder — it explains **what's new**, the **theory**, and **what to try**.
 
-## ⚠️ Лимиты free tier (Google AI Studio)
+## ⚠️ Free tier limits (Google AI Studio)
 
-Free-ключ из AI Studio имеет **жёсткие лимиты по запросам в минуту (RPM), токенам в минуту (TPM) и запросам в день (RPD)**. Для воркшопа это критично — на 20 человек × 20 запросов в день модели легко не хватит. Ниже актуальные лимиты для самых полезных моделей.
+The free AI Studio key has **strict per-minute (RPM), per-minute-tokens (TPM), and per-day (RPD) quotas**. For a workshop this matters a lot — 20 people × 20 requests/day on `gemini-2.5-flash` will run out fast. Current limits for the most useful models:
 
-### Text-out модели (то, что используется в воркшопе)
+### Text-out models (what we use in the workshop)
 
-| Модель                                  | RPM | TPM     | RPD   | Где применять в воркшопе                                  |
-|-----------------------------------------|-----|---------|-------|------------------------------------------------------------|
-| `gemini-2.5-flash`                      | 5   | 250 000 | **20**| Default во всех checkpoint'ах. **Скудный дневной лимит!**  |
-| `gemini-2.5-flash-lite`                 | 10  | 250 000 | 20    | Быстрее и легче, но тот же RPD                             |
-| `gemini-3-flash`                        | 5   | 250 000 | 20    | Альтернатива 2.5 flash                                     |
-| `gemini-3.5-flash`                      | 5   | 250 000 | 20    | Альтернатива 2.5 flash                                     |
-| `gemini-3.1-flash-lite`                 | 15  | 250 000 | **500** | **Лучший free-вариант** для экспериментов и evaluation   |
-| `gemini-2.5-pro` / `gemini-3.1-pro`     | 0   | 0       | 0     | На free tier недоступны — нужен paid plan                  |
+| Model                                   | RPM | TPM     | RPD     | Where to use                                                  |
+|-----------------------------------------|-----|---------|---------|---------------------------------------------------------------|
+| `gemini-2.5-flash`                      | 5   | 250,000 | **20**  | Capable, but **very tight daily limit**                        |
+| `gemini-2.5-flash-lite`                 | 10  | 250,000 | 20      | Faster and lighter, same RPD                                   |
+| `gemini-3-flash`                        | 5   | 250,000 | 20      | Alternative to 2.5 flash                                       |
+| `gemini-3.5-flash`                      | 5   | 250,000 | 20      | Alternative to 2.5 flash                                       |
+| `gemini-3.1-flash-lite`                 | 15  | 250,000 | **500** | **Best free option** — workshop default                        |
+| `gemini-2.5-pro` / `gemini-3.1-pro`     | 0   | 0       | 0       | Not available on free tier — paid plan required                |
 
-### Другие модели
+### Other models
 
-| Модель              | RPM | TPM     | RPD     | Применение                                            |
-|---------------------|-----|---------|---------|--------------------------------------------------------|
-| `gemma-4-26b`       | 15  | ∞       | 1 500   | Open-weight, без лимита токенов — для batch-экспериментов |
-| `gemma-4-31b`       | 15  | ∞       | 1 500   | То же, чуть мощнее                                     |
-| `gemini-embedding-1`| 100 | 30 000  | 1 000   | Если делаете RAG поверх агента                         |
-| `gemini-2.5-flash-tts` | 3 | 10 000 | 10      | Text-to-speech (для голосовых демо)                    |
+| Model                | RPM | TPM     | RPD     | Use                                                       |
+|----------------------|-----|---------|---------|-----------------------------------------------------------|
+| `gemma-4-26b`        | 15  | ∞       | 1,500   | Open-weight, unlimited tokens — good for batch jobs       |
+| `gemma-4-31b`        | 15  | ∞       | 1,500   | Same, a bit more capable                                  |
+| `gemini-embedding-1` | 100 | 30,000  | 1,000   | If you do RAG on top of an agent                          |
+| `gemini-2.5-flash-tts` | 3 | 10,000  | 10      | Text-to-speech (for voice demos)                          |
 
-### Live API (для блока про BIDI / голос)
+### Live API (for the BIDI / voice block)
 
-| Модель                                | RPM | TPM     | RPD   |
-|---------------------------------------|-----|---------|-------|
-| `gemini-2.5-flash-native-audio-dialog`| ∞   | 1M      | ∞     |
-| `gemini-3-flash-live`                 | ∞   | 65 000  | ∞     |
+| Model                                    | RPM | TPM      | RPD   |
+|------------------------------------------|-----|----------|-------|
+| `gemini-2.5-flash-native-audio-dialog`   | ∞   | 1M       | ∞     |
+| `gemini-3-flash-live`                    | ∞   | 65,000   | ∞     |
 
-### Search grounding (для `google_search` tool)
+### Search grounding (for the `google_search` tool)
 
-- Gemini 2.x: **1 500 запросов с grounding в день**
-- Gemini 3.x: пока 0 (не доступно на free tier)
+- Gemini 2.x: **1,500 grounded requests per day**
+- Gemini 3.x: 0 (not available on free tier yet)
 
-### Стратегии экономии для воркшопа
+### Saving quota for the workshop
 
-**Для спикера на этапе подготовки:**
-- Прогоните полный сценарий заранее, чтобы знать примерный расход.
-- Заведите несколько API-ключей — AI Studio разрешает создавать их на разные Google-аккаунты.
-- Eval с `num_runs > 1` × 2 (default) умножает расход — для воркшопа достаточно `num_runs=1`.
+**For the speaker, during prep:**
+- Walk through the full scenario in advance to estimate consumption.
+- Create multiple API keys — AI Studio allows several per Google account.
+- `num_runs > 1` in eval (default is 2) multiplies the cost — `num_runs=1` is enough for a workshop.
 
-**Для участников:**
-1. **Используйте `gemini-3.1-flash-lite` вместо `gemini-2.5-flash`** в большинстве примеров — 500 RPD вместо 20.
+**For participants:**
+1. **Use `gemini-3.1-flash-lite` instead of `gemini-2.5-flash`** in most examples — 500 RPD vs 20.
    ```python
    root_agent = Agent(model="gemini-3.1-flash-lite", ...)
    ```
-2. **Перед запуском evaluation** уменьшите `num_runs` до 1 и используйте только дешёвые метрики (`tool_trajectory_avg_score`, `response_match_score` — без LLM-as-Judge).
-3. **Не гоняйте streaming-демо в цикле** — длинные истории быстро съедают TPM.
-4. **Избегайте `google_search` в каждом примере** — он считается отдельно.
+2. **Before running evaluation**, set `num_runs=1` and use only cheap metrics (`tool_trajectory_avg_score`, `response_match_score` — skip LLM-as-Judge ones).
+3. **Don't loop the streaming demo** — long stories burn through TPM quickly.
+4. **Avoid putting `google_search` in every example** — it counts separately.
 
-**Если упёрлись в лимит:**
-- Сообщение `429 RESOURCE_EXHAUSTED` — подождите минуту или до следующего дня (по UTC).
-- Можно переключиться на **Vertex AI Express Mode** (бесплатный tier, отдельные квоты): `GOOGLE_GENAI_USE_VERTEXAI=TRUE` в `.env`.
-- Или на **Gemma** через AI Studio — у неё RPD намного выше (1 500).
+**If you hit a limit:**
+- `429 RESOURCE_EXHAUSTED` — wait a minute, or until UTC midnight for daily reset.
+- Switch to **Vertex AI Express Mode** (free tier with separate quotas): `GOOGLE_GENAI_USE_VERTEXAI=TRUE` in `.env`.
+- Or switch to **Gemma** via AI Studio — much higher RPD (1,500).
 
-> Источник лимитов: ваша персональная страница [aistudio.google.com → API keys → Plan & billing](https://aistudio.google.com/apikey). Лимиты могут меняться — Google периодически обновляет квоты для free tier.
+> Source of these limits: your personal page at [aistudio.google.com → API keys → Plan & billing](https://aistudio.google.com/apikey). Google updates free-tier quotas periodically.
 
-## Запуск тестов (блок 9)
+## Running tests (Block 9)
 
 ```bash
 cd checkpoints/09_evaluation
 
-# Вариант A — через ADK CLI
+# Option A — via ADK CLI
 adk eval my_first_agent my_first_agent/tests/basic.evalset.json
 
-# Вариант B — через pytest
+# Option B — via pytest
 pytest -v my_first_agent/tests/test_agent.py
 ```
 
-## Запуск ноутбука
+## Running the notebook
 
 ```bash
 uv pip install jupyter
 jupyter notebook workshop_notebook.ipynb
 ```
 
-Или загрузите `workshop_notebook.ipynb` в [Google Colab](https://colab.research.google.com/).
+Or upload `workshop_notebook.ipynb` to [Google Colab](https://colab.research.google.com/).
 
-## Проверка окружения
+## Environment self-check
 
 ```bash
 python verify_setup.py
 ```
 
-Скрипт проверит:
-1. Все 8 checkpoint'ов корректно импортируются.
-2. У каждого правильно установлены tools / callbacks / sub_agents.
-3. `InMemoryRunner` создаётся для каждого.
-4. (Если есть `GOOGLE_API_KEY` в `.env`) — реальный вызов агента из checkpoint 04 и проверка ответа.
+The script verifies:
+1. All 8 checkpoints import correctly.
+2. Each one has the right tools / callbacks / sub_agents wired up.
+3. `InMemoryRunner` can be constructed for each.
+4. (If `GOOGLE_API_KEY` is set) — runs a real call against checkpoint 04 and validates the response.
 
-## Рекомендуемый порядок для участников
+## Recommended path for participants
 
-1. Открыть `slides.pptx` и `workshop_plan.md` рядом — план содержит больше деталей, чем умещается на слайды.
-2. Идти по checkpoint'ам последовательно, читая `README.md` в каждом и запуская через `adk web`.
-3. После блока 5 переключиться на `workshop_notebook.ipynb` для streaming/callbacks/eval — там удобнее показывать программный запуск.
-4. На блоке 9 запустить `pytest` локально.
+1. Open the slides (Google Slides link above) and `workshop_plan.md` side by side — the plan has more detail than fits on slides.
+2. Walk through the checkpoints in order, reading the `README.md` in each one and running it via `adk web`.
+3. After Block 5, switch to `workshop_notebook.ipynb` for streaming/callbacks/eval — it's more convenient for showing programmatic runs.
+4. In Block 9, run `pytest` locally.
 
-## Ссылки
+## Links
 
-- [Документация ADK](https://google.github.io/adk-docs/)
+- [ADK documentation](https://google.github.io/adk-docs/)
 - [Quickstart](https://google.github.io/adk-docs/get-started/quickstart/)
 - [Gemini API (AI Studio)](https://aistudio.google.com/)
-- [Примеры на GitHub](https://github.com/google/adk-samples)
+- [Examples on GitHub](https://github.com/google/adk-samples)
 - [Model Context Protocol](https://modelcontextprotocol.io/)
 - [uv documentation](https://docs.astral.sh/uv/)

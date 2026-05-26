@@ -1,7 +1,7 @@
 {
   "eval_set_id": "basic",
-  "name": "Базовый набор: погода и время",
-  "description": "Минимальный evalset на 2 кейса для weather_time_agent.",
+  "name": "Basic set: weather and time",
+  "description": "Minimal 2-case evalset for weather_time_agent.",
   "eval_cases": [
     {
       "eval_id": "weather_ny",
@@ -9,11 +9,11 @@
         {
           "invocation_id": "1",
           "user_content": {
-            "parts": [{"text": "Какая погода в Нью-Йорке?"}],
+            "parts": [{"text": "What's the weather in New York?"}],
             "role": "user"
           },
           "final_response": {
-            "parts": [{"text": "В Нью-Йорке солнечно, 25°C."}],
+            "parts": [{"text": "It's sunny in New York, 25°C."}],
             "role": "model"
           },
           "intermediate_data": {
@@ -41,11 +41,11 @@
         {
           "invocation_id": "1",
           "user_content": {
-            "parts": [{"text": "Который сейчас час в Лондоне?"}],
+            "parts": [{"text": "What time is it in London?"}],
             "role": "user"
           },
           "final_response": {
-            "parts": [{"text": "Текущее время в Лондоне."}],
+            "parts": [{"text": "Current time in London."}],
             "role": "model"
           },
           "intermediate_data": {

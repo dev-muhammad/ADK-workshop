@@ -1,35 +1,35 @@
 # Checkpoint 05 · Memory & Sessions
 
-## Что нового в этом шаге
+## What's new in this step
 
-Добавили агенту **структурированную память** в рамках сессии и показали, как программно управлять сессией через `InMemoryRunner`.
+The agent gets **structured memory** within a session, plus a demonstration of programmatic session management via `InMemoryRunner`.
 
-Изменили:
-- `agent.py` — добавлены два tool'а `remember_preference(key, value)` и `recall_preference(key)`, которые работают с `tool_context.state`.
-- Новый файл `run_session_demo.py` — демонстрация программного запуска с многошаговым разговором.
+Changes:
+- `agent.py` — two new tools `remember_preference(key, value)` and `recall_preference(key)` working with `tool_context.state`.
+- New file `run_session_demo.py` — demonstrates programmatic execution with a multi-turn conversation.
 
-## Теория
+## Theory
 
-**Три уровня «памяти» в ADK:**
+**Three levels of "memory" in ADK:**
 
-| Уровень   | Класс / поле                                | Что хранит                                                        |
-|-----------|---------------------------------------------|-------------------------------------------------------------------|
-| Session   | `Session`, `InMemorySessionService`          | История сообщений и событий одного разговора (автоматически)      |
-| State     | `session.state` / `tool_context.state`       | Структурированный dict внутри сессии (имя, предпочтения, флаги)   |
-| Memory    | `MemoryService`                              | Долговременная память между сессиями (профиль, RAG-индексы)       |
+| Level     | Class / field                                | What it stores                                                     |
+|-----------|----------------------------------------------|--------------------------------------------------------------------|
+| Session   | `Session`, `InMemorySessionService`          | Message and event history of a single conversation (automatic)     |
+| State     | `session.state` / `tool_context.state`       | Structured dict inside a session (name, preferences, flags)        |
+| Memory    | `MemoryService`                              | Long-term memory across sessions (profile, RAG indices)            |
 
-**Session** — это сам факт «разговор номер X у пользователя Y». ADK сам ведёт историю сообщений.
+**Session** — the fact "conversation X for user Y". ADK manages the message history itself.
 
-**State** — это `dict`, который живёт внутри сессии. Можно:
-- Читать/писать из tool через `tool_context.state["key"]`.
-- Передавать в callback через `callback_context.state`.
-- Видеть в реальном времени в `adk web` → вкладка State.
+**State** — a `dict` that lives inside a session. You can:
+- Read/write from a tool via `tool_context.state["key"]`.
+- Pass it to a callback via `callback_context.state`.
+- Watch it live in `adk web` → State tab.
 
-**Memory** — для информации, которая должна пережить сессию (например, «пользователь любит компактные ответы»). В production используются `VertexAiMemoryService`, `DatabaseMemoryService` и т.д.
+**Memory** — for information that should outlive a session (e.g., "user prefers compact answers"). In production: `VertexAiMemoryService`, `DatabaseMemoryService`, etc.
 
-**Важное правило:** `InMemorySessionService` и `InMemoryRunner` — только для dev. В production выбирайте `DatabaseSessionService` (Postgres/MySQL), `VertexAiSessionService`, или Redis-backed.
+**Important rule:** `InMemorySessionService` and `InMemoryRunner` are dev-only. In production pick `DatabaseSessionService` (Postgres/MySQL), `VertexAiSessionService`, or a Redis-backed one.
 
-## Структура
+## Structure
 
 ```
 05_memory_sessions/
@@ -37,44 +37,44 @@
 │   ├── __init__.py
 │   ├── agent.py              ← + remember_preference / recall_preference
 │   └── .env.example
-└── run_session_demo.py       ← программный запуск через InMemoryRunner
+└── run_session_demo.py       ← programmatic run via InMemoryRunner
 ```
 
-## Запуск
+## Running
 
-**Вариант A — dev UI:**
+**Option A — dev UI:**
 
 ```bash
 cd checkpoints/05_memory_sessions
 adk web
 ```
 
-Сценарий разговора:
-1. «Мой любимый город — Tashkent. Запомни.»
-2. «Какая там погода?» (должен использовать сохранённый город)
-3. «А что я тебе говорил про мои предпочтения?»
+Conversation script:
+1. "My favorite city is Tashkent. Remember that."
+2. "What's the weather there?" (should use the saved city)
+3. "And what did I tell you about my preferences?"
 
-В dev UI откройте вкладку **State** — увидите, как растёт `state["favorite_city"]`.
+In the dev UI open the **State** tab — watch `state["favorite_city"]` grow.
 
-**Вариант B — программный запуск:**
+**Option B — programmatic run:**
 
 ```bash
 cd checkpoints/05_memory_sessions
-# подготовить .env
+# prepare .env
 cp my_first_agent/.env.example my_first_agent/.env
-# вписать GOOGLE_API_KEY
+# paste GOOGLE_API_KEY
 
 python run_session_demo.py
 ```
 
-Этот скрипт показывает, как в собственном Python-коде:
-- создать `InMemoryRunner`,
-- завести сессию,
-- слать сообщения через `runner.run_async(...)`,
-- получать события и финальные ответы.
+This script shows how, from your own Python code, to:
+- create an `InMemoryRunner`,
+- start a session,
+- send messages via `runner.run_async(...)`,
+- receive events and final responses.
 
-## Что пробовать
+## Things to try
 
-- В разных сессиях у одного пользователя сохраните разные `favorite_city` — убедитесь, что state не «протекает».
-- Добавьте tool `clear_all_preferences(tool_context)` и попросите агента забыть всё.
-- В `run_session_demo.py` сохраните `session.id` в файл и при следующем запуске продолжите разговор — но помните: `InMemorySessionService` живёт только в памяти процесса, для persistence нужен другой `SessionService`.
+- In different sessions for the same user, save different `favorite_city` values — confirm state doesn't "leak".
+- Add a tool `clear_all_preferences(tool_context)` and ask the agent to forget everything.
+- In `run_session_demo.py`, save `session.id` to a file and on the next run continue the conversation — remember: `InMemorySessionService` lives only in the process's memory; you need another `SessionService` for persistence.

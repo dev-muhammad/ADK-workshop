@@ -1,17 +1,17 @@
-"""Блок 6. Streaming.
+"""Block 6. Streaming.
 
-Сам агент остаётся прежним — streaming управляется через RunConfig
-в Runner, см. streaming_demo.py.
+The agent itself stays the same — streaming is controlled via RunConfig
+in the Runner, see streaming_demo.py.
 
-Запуск:
+Run:
     cd checkpoints/06_streaming
     python streaming_demo.py
 """
 
 import os
 
-# Имя модели читается из ADK_MODEL (см. .env / .env.example).
-# Fallback на gemini-3.1-flash-lite — у него самый щедрый free-tier RPD (500/день).
+# Model name is read from ADK_MODEL (see .env / .env.example).
+# Falls back to gemini-3.1-flash-lite — the most generous free-tier RPD (500/day).
 MODEL = os.getenv("ADK_MODEL", "gemini-3.1-flash-lite")
 
 from google.adk.agents import Agent
@@ -19,9 +19,9 @@ from google.adk.agents import Agent
 root_agent = Agent(
     name="storytelling_agent",
     model=MODEL,
-    description="Агент, который рассказывает длинные истории — идеально для демонстрации streaming.",
+    description="Agent that tells long stories — perfect for demonstrating streaming.",
     instruction=(
-        "Ты — рассказчик. Когда пользователь просит — рассказывай длинные, "
-        "детальные истории с описаниями. Минимум 5-6 абзацев."
+        "You are a storyteller. When asked — tell long, detailed stories "
+        "with rich descriptions. At least 5-6 paragraphs."
     ),
 )

@@ -1,20 +1,20 @@
-"""Демо программного запуска агента через InMemoryRunner.
+"""Demo: programmatic agent run via InMemoryRunner.
 
-Запуск:
+Run:
     cd checkpoints/05_memory_sessions
     python run_session_demo.py
 
-Что демонстрирует:
-  - создание сессии через InMemorySessionService
-  - повторные вызовы с одним session_id => агент помнит контекст
-  - вывод финальных ответов
+What it demonstrates:
+  - creating a session via InMemorySessionService
+  - subsequent calls with the same session_id => agent remembers context
+  - printing the final responses
 """
 
 import asyncio
 
 from dotenv import load_dotenv
 
-# load_dotenv должен идти ДО импорта агента — иначе ADK_MODEL не будет подхвачен.
+# load_dotenv must run BEFORE the agent import — otherwise ADK_MODEL won't be picked up.
 load_dotenv("my_first_agent/.env")
 
 from google.adk.runners import InMemoryRunner  # noqa: E402
@@ -27,7 +27,7 @@ USER_ID = "user_1"
 
 
 async def send(runner: InMemoryRunner, session_id: str, text: str) -> None:
-    """Отправить сообщение и вывести финальный ответ."""
+    """Send a message and print the final response."""
     print(f"\n>>> User: {text}")
     async for event in runner.run_async(
         user_id=USER_ID,
@@ -46,9 +46,9 @@ async def main() -> None:
         app_name=APP_NAME, user_id=USER_ID
     )
 
-    await send(runner, session.id, "Меня зовут Мухаммад, мой любимый город — Tashkent. Запомни.")
-    await send(runner, session.id, "Какая там сейчас погода?")
-    await send(runner, session.id, "А как меня зовут?")
+    await send(runner, session.id, "My name is Muhammad, my favorite city is Tashkent. Remember that.")
+    await send(runner, session.id, "What's the weather there right now?")
+    await send(runner, session.id, "And what's my name?")
 
 
 if __name__ == "__main__":

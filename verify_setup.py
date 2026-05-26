@@ -1,16 +1,18 @@
-"""Smoke-test всей установки: импорты, инстанцирование, реальный вызов LLM.
+"""End-to-end smoke test of the install: imports, instantiation, real LLM call.
 
-Запуск:
-    # из корня репозитория, в активированном .venv
+Run:
+    # from the repo root, with .venv activated
     cp checkpoints/04_tools/my_first_agent/.env.example .env
-    # отредактируйте .env и впишите GOOGLE_API_KEY
+    # edit .env and paste your GOOGLE_API_KEY
+
     python verify_setup.py
 
-Что проверяется:
-  1. Каждый checkpoint импортируется и `root_agent` существует.
-  2. У всех агентов корректные tools/callbacks/sub_agents.
-  3. InMemoryRunner запускается для каждого.
-  4. (Если есть GOOGLE_API_KEY) — реальный вызов агента из checkpoint 04 и проверка ответа.
+What it checks:
+  1. Every checkpoint imports and exposes a `root_agent`.
+  2. All agents have the expected tools/callbacks/sub_agents.
+  3. InMemoryRunner can be constructed for each.
+  4. (If GOOGLE_API_KEY is set) — runs a real call against checkpoint 04 and
+     validates the response.
 """
 
 from __future__ import annotations
@@ -44,12 +46,12 @@ def section(title: str) -> None:
 
 
 def check_imports() -> dict[str, object]:
-    """Импортирует root_agent для каждого checkpoint и возвращает их."""
-    section("1/3 · Импорт всех checkpoint-агентов")
+    """Import root_agent for each checkpoint and return them."""
+    section("1/3 · Importing every checkpoint agent")
     agents = {}
     for cp in CHECKPOINTS:
         sys.path.insert(0, str(ROOT / "checkpoints" / cp))
-        # сбросить кэшированный модуль, чтобы импортировать заново
+        # Drop cached modules so each checkpoint is imported fresh.
         for m in list(sys.modules):
             if m.startswith("my_first_agent"):
                 del sys.modules[m]
@@ -79,25 +81,25 @@ def check_imports() -> dict[str, object]:
 
 
 def check_runners(agents: dict[str, object]) -> None:
-    """Создаёт InMemoryRunner для каждого агента — без API-вызовов."""
-    section("2/3 · InMemoryRunner для каждого агента")
+    """Create an InMemoryRunner for each agent — no API calls."""
+    section("2/3 · InMemoryRunner for every agent")
     from google.adk.runners import InMemoryRunner
 
     for cp, agent in agents.items():
         runner = InMemoryRunner(agent=agent, app_name=f"smoke_{cp}")
         assert runner is not None
-        print(f"  [OK] {cp}: Runner создан")
+        print(f"  [OK] {cp}: Runner created")
 
 
 async def check_real_call() -> None:
-    """Реально вызывает Gemini через checkpoint 04 (нужен GOOGLE_API_KEY)."""
-    section("3/3 · Реальный вызов агента (checkpoint 04_tools)")
+    """Real call to Gemini via checkpoint 04 (requires GOOGLE_API_KEY)."""
+    section("3/3 · Real agent call (checkpoint 04_tools)")
 
     if not os.environ.get("GOOGLE_API_KEY"):
         print(
-            "  [SKIP] GOOGLE_API_KEY не найден.\n"
-            "         Чтобы прогнать реальный тест:\n"
-            "         export GOOGLE_API_KEY=ваш_ключ_из_aistudio.google.com\n"
+            "  [SKIP] GOOGLE_API_KEY not found.\n"
+            "         To run the real test:\n"
+            "         export GOOGLE_API_KEY=your_key_from_aistudio.google.com\n"
             "         python verify_setup.py"
         )
         return
@@ -134,23 +136,23 @@ async def check_real_call() -> None:
                     tool_calls.append(part.function_call.name)
 
     full = "".join(response_chunks).strip()
-    print(f"  [OK] Ответ от LLM: {full[:120]}{'…' if len(full) > 120 else ''}")
+    print(f"  [OK] LLM response: {full[:120]}{'…' if len(full) > 120 else ''}")
     print(f"  [OK] Tool calls: {tool_calls}")
-    assert tool_calls, "Ожидался вызов get_weather"
-    assert "weather" in full.lower() or "погод" in full.lower() or "york" in full.lower(), (
-        f"Ответ не похож на ответ о погоде: {full!r}"
+    assert tool_calls, "Expected a get_weather call"
+    assert "weather" in full.lower() or "york" in full.lower() or "sunny" in full.lower(), (
+        f"Response doesn't look weather-related: {full!r}"
     )
-    print("  [OK] Smoke-тест с реальным API прошёл.")
+    print("  [OK] Real-API smoke test passed.")
 
 
 async def main() -> None:
-    load_dotenv(ROOT / ".env")  # подтянуть GOOGLE_API_KEY, если есть
+    load_dotenv(ROOT / ".env")  # picks up GOOGLE_API_KEY if present
 
     agents = check_imports()
     check_runners(agents)
     await check_real_call()
 
-    section("Всё OK — окружение готово к воркшопу.")
+    section("All OK — environment is ready for the workshop.")
 
 
 if __name__ == "__main__":

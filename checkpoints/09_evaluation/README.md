@@ -1,52 +1,52 @@
-# Checkpoint 09 · Evaluation — измеряем качество агента
+# Checkpoint 09 · Evaluation — measuring agent quality
 
-## Что нового в этом шаге
+## What's new in this step
 
-Добавили **папку `tests/`** с полным набором файлов для запуска evaluation: `test_config.json`, `basic.evalset.json`, pytest-обёртка. Это позволяет автоматически прогонять regression-тесты при каждом изменении промпта или модели.
+We add a **`tests/` folder** with the full setup to run evaluation: `test_config.json`, `basic.evalset.json`, a pytest wrapper. This lets you run regression tests automatically on every prompt/model change.
 
-Изменили:
-- `agent.py` — финальная версия weather+time agent'а.
-- Новые: `tests/test_config.json`, `tests/basic.evalset.json`, `tests/test_agent.py`.
+Changes:
+- `agent.py` — the baseline weather+time agent.
+- New files: `tests/test_config.json`, `tests/basic.evalset.json`, `tests/test_agent.py`.
 
-## Теория
+## Theory
 
-**Зачем нужен evaluation?**
-После каждого изменения (новая модель, новый промпт, новый tool) хочется автоматически знать: стало лучше или хуже? Без eval'а — будете гонять ручные «smoke»-тесты, медленно и непоследовательно.
+**Why evaluation?**
+After every change (new model, new prompt, new tool) you want to automatically know: did it get better or worse? Without eval, you'll run manual "smoke" tests — slowly and inconsistently.
 
-**Три способа запустить eval в ADK:**
+**Three ways to run eval in ADK:**
 
-| Способ        | Когда                              | Команда                                          |
-|---------------|------------------------------------|--------------------------------------------------|
-| **Dev UI**    | Интерактивная отладка              | `adk web` → вкладка Eval                          |
-| **CLI**       | Для CI/CD пайплайнов               | `adk eval <agent_folder> <evalset_file>`         |
-| **pytest**    | Регрессионные тесты в test-suite   | `AgentEvaluator.evaluate(...)`                   |
+| Method        | When                              | Command                                         |
+|---------------|-----------------------------------|-------------------------------------------------|
+| **Dev UI**    | Interactive debugging             | `adk web` → Eval tab                            |
+| **CLI**       | For CI/CD pipelines               | `adk eval <agent_folder> <evalset_file>`        |
+| **pytest**    | Regression tests in a test suite  | `AgentEvaluator.evaluate(...)`                  |
 
-**Структура файлов:**
+**File layout:**
 
-- `test_config.json` — пороги по метрикам. Если score < threshold — тест падает.
-- `<name>.evalset.json` — eval-кейсы в новой schema (multi-turn разговоры).
-- `<name>.test.json` — простые одноходовые тесты в старой schema.
+- `test_config.json` — thresholds per metric. If a score < threshold — the test fails.
+- `<name>.evalset.json` — eval cases in the new schema (multi-turn conversations).
+- `<name>.test.json` — simple single-turn tests in the old schema.
 
-**Семь главных метрик:**
+**Seven key metrics:**
 
-| Метрика                                  | Что измеряет                                                    | Стоимость               |
+| Metric                                  | What it measures                                                | Cost                    |
 |------------------------------------------|------------------------------------------------------------------|-------------------------|
-| `tool_trajectory_avg_score`              | Совпадение последовательности tool-вызовов                       | Бесплатно (string match)|
-| `response_match_score`                   | ROUGE-1 сходство текста с эталоном                               | Бесплатно               |
-| `final_response_match_v2`                | Семантическое сходство (LLM-as-Judge)                            | Платно (вызов модели)   |
-| `rubric_based_final_response_quality_v1` | Качество ответа по вашим рубрикам                                | Платно                  |
-| `rubric_based_tool_use_quality_v1`       | Качество использования tools по рубрикам                         | Платно                  |
-| `hallucinations_v1`                      | Проверка на галлюцинации против контекста                        | Платно                  |
-| `safety_v1`                              | Безопасность ответа (через Vertex AI Eval SDK, нужен GCP)        | Платно                  |
+| `tool_trajectory_avg_score`              | Match of the tool-call sequence                                  | Free (string match)     |
+| `response_match_score`                   | ROUGE-1 similarity to reference                                  | Free                    |
+| `final_response_match_v2`                | Semantic match (LLM-as-Judge)                                    | Paid (model call)       |
+| `rubric_based_final_response_quality_v1` | Response quality per your rubrics                                | Paid                    |
+| `rubric_based_tool_use_quality_v1`       | Tool-use quality per rubrics                                     | Paid                    |
+| `hallucinations_v1`                      | Hallucination check against context                              | Paid                    |
+| `safety_v1`                              | Response safety (via Vertex AI Eval SDK, needs GCP)              | Paid                    |
 
-**Стратегия:** в CI на каждый PR — только дешёвые метрики (`tool_trajectory_avg_score` + `response_match_score`). Дорогие LLM-as-Judge — гоняйте по nightly cron'у или вручную перед релизом.
+**Strategy:** in CI on every PR — only the cheap metrics (`tool_trajectory_avg_score` + `response_match_score`). The expensive LLM-as-Judge ones — run on a nightly cron or manually before release.
 
 **`tool_trajectory_avg_score` match types:**
-- `EXACT` (default) — точное совпадение последовательности.
-- `IN_ORDER` — ключевые tools в нужном порядке, между ними допустимы лишние.
-- `ANY_ORDER` — нужные tools должны быть, порядок не важен.
+- `EXACT` (default) — exact sequence match.
+- `IN_ORDER` — required tools must appear in order, extras allowed in between.
+- `ANY_ORDER` — required tools must appear, order doesn't matter.
 
-## Структура
+## Structure
 
 ```
 09_evaluation/
@@ -56,32 +56,32 @@
     ├── .env.example
     └── tests/
         ├── __init__.py
-        ├── test_config.json        ← пороги
-        ├── basic.evalset.json      ← тестовые кейсы
-        └── test_agent.py           ← pytest-обёртка
+        ├── test_config.json        ← thresholds
+        ├── basic.evalset.json      ← test cases
+        └── test_agent.py           ← pytest wrapper
 ```
 
-## Запуск
+## Running
 
 ```bash
 cd checkpoints/09_evaluation
 
-# Подготовить .env
+# Prepare .env
 cp my_first_agent/.env.example my_first_agent/.env
-# вписать GOOGLE_API_KEY
+# paste GOOGLE_API_KEY
 
-# Вариант A — через ADK CLI
+# Option A — via ADK CLI
 adk eval my_first_agent my_first_agent/tests/basic.evalset.json
 
-# Вариант B — через pytest
+# Option B — via pytest
 pytest -v my_first_agent/tests/test_agent.py
 ```
 
-При успехе — увидите `PASSED` и метрики. При падении — таблицу с expected vs actual для каждого invocation'а.
+On success — you'll see `PASSED` and the metrics. On failure — a table with expected vs actual per invocation.
 
-## Что пробовать
+## Things to try
 
-- Добавьте кейс в `basic.evalset.json`: «Какая погода в Tashkent?» с ожидаемым tool call `get_weather("Tashkent")`.
-- Уберите `get_weather` из tools и прогоните тесты — увидите, что `tool_trajectory_avg_score` упадёт.
-- Включите `final_response_match_v2` в `test_config.json`, добавив порог `0.8` — увидите дополнительный платный прогон через LLM-as-Judge.
-- Подключите тесты к CI: `pytest` в GitHub Actions с GOOGLE_API_KEY из secrets.
+- Add a case to `basic.evalset.json`: "What's the weather in Tashkent?" with the expected tool call `get_weather("Tashkent")`.
+- Remove `get_weather` from tools and run the tests — `tool_trajectory_avg_score` will drop.
+- Add `final_response_match_v2` to `test_config.json` with threshold `0.8` — you'll see an extra paid run through LLM-as-Judge.
+- Wire the tests into CI: `pytest` in GitHub Actions with `GOOGLE_API_KEY` from secrets.

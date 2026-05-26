@@ -1,77 +1,77 @@
-"""Блок 8. Sub-agents и MCP.
+"""Block 8. Sub-agents and MCP.
 
-Demo multi-agent системы: coordinator делегирует задачи researcher и writer.
+Multi-agent demo: a coordinator delegates tasks to researcher and writer.
 
-ВАЖНОЕ ОГРАНИЧЕНИЕ Gemini API:
-    Встроенные tools (google_search, code_execution) НЕЛЬЗЯ использовать
-    одновременно с обычным function-calling в одном агенте. А ADK при
-    sub_agents=[...] инжектит в каждого sub-агента функцию transfer_to_agent —
-    что вызывает ошибку:
+IMPORTANT Gemini API LIMITATION:
+    Built-in tools (google_search, code_execution) CANNOT be used together
+    with regular function-calling on the same agent. And with sub_agents=[...],
+    ADK auto-injects a `transfer_to_agent` function into each sub-agent —
+    which triggers:
         400 INVALID_ARGUMENT: Please enable
         tool_config.include_server_side_tool_invocations to use
         Built-in tools with Function calling.
 
-РЕШЕНИЕ — паттерн AgentTool:
-    Оборачиваем researcher/writer как tools координатора через AgentTool.
-    Каждый sub-агент запускается изолированно (отдельный sub-runner),
-    в своём контексте — никаких injected функций. Координатор просто
-    вызывает их как обычные функции и получает текстовый результат.
+SOLUTION — the AgentTool pattern:
+    Wrap researcher/writer as tools of the coordinator via AgentTool.
+    Each sub-agent runs in isolation (its own sub-runner), in its own context —
+    no injected functions. The coordinator simply calls them like regular
+    functions and gets a textual result back.
 
-Запуск:
+Run:
     cd checkpoints/08_sub_agents_mcp
     adk web
 """
 
 import os
 
-# Имя модели читается из ADK_MODEL (см. .env / .env.example).
-# Fallback на gemini-3.1-flash-lite — у него самый щедрый free-tier RPD (500/день).
+# Model name is read from ADK_MODEL (see .env / .env.example).
+# Falls back to gemini-3.1-flash-lite — the most generous free-tier RPD (500/day).
 MODEL = os.getenv("ADK_MODEL", "gemini-3.1-flash-lite")
 
 from google.adk.agents import LlmAgent
 from google.adk.tools import google_search
 from google.adk.tools.agent_tool import AgentTool
 
-# --- Sub-agent 1: исследователь (с built-in google_search) ---
-# Изолирован: его google_search НЕ конфликтует ни с чем,
-# потому что researcher запускается как AgentTool, без injected transfer_to_agent.
+# --- Sub-agent 1: researcher (with built-in google_search) ---
+# Isolated: its google_search does NOT conflict with anything,
+# because researcher is run as an AgentTool, without an injected transfer_to_agent.
 researcher = LlmAgent(
     name="researcher",
     model=MODEL,
-    description="Ищет факты в интернете через Google Search.",
+    description="Searches the web for facts using Google Search.",
     instruction=(
-        "Ты — исследователь. Используй google_search, чтобы найти "
-        "актуальные факты по запросу. Верни структурированный список "
-        "из 3–5 ключевых фактов с источниками."
+        "You are a researcher. Use google_search to find "
+        "current facts on the user's query. Return a structured list "
+        "of 3–5 key facts with sources."
     ),
     tools=[google_search],
 )
 
-# --- Sub-agent 2: писатель (без tools, только LLM) ---
+# --- Sub-agent 2: writer (no tools, LLM only) ---
 writer = LlmAgent(
     name="writer",
     model=MODEL,
-    description="Пишет краткие статьи на основе предоставленных фактов.",
+    description="Writes short articles based on provided facts.",
     instruction=(
-        "Ты — писатель. На основе фактов, которые передал coordinator, "
-        "напиши краткую статью в 3–4 абзацах. Стиль — нейтральный, "
-        "понятный широкой аудитории."
+        "You are a writer. Based on the facts handed over by the coordinator, "
+        "write a short 3–4 paragraph article. Style: neutral, accessible "
+        "to a general audience."
     ),
 )
 
-# --- Координатор (root agent) ---
-# Использует AgentTool вместо sub_agents=[...].
-# Это обходит ограничение Gemini на смешивание built-in tools и function-calling.
+# --- Coordinator (root agent) ---
+# Uses AgentTool instead of sub_agents=[...].
+# This sidesteps Gemini's restriction on mixing built-in tools and function-calling.
 root_agent = LlmAgent(
     name="research_coordinator",
     model=MODEL,
-    description="Координирует исследование и написание статьи.",
+    description="Coordinates research and article writing.",
     instruction=(
-        "Ты — координатор. На запрос пользователя:\n"
-        "1. Вызови tool `researcher` — он соберёт факты через Google Search.\n"
-        "2. Передай эти факты в tool `writer` — он напишет статью.\n"
-        "3. Верни пользователю финальную статью.\n"
-        "Не выдумывай факты сам — всегда опирайся на то, что вернул researcher."
+        "You are the coordinator. For the user's request:\n"
+        "1. Call the `researcher` tool — it will gather facts via Google Search.\n"
+        "2. Pass those facts to the `writer` tool — it will draft the article.\n"
+        "3. Return the final article to the user.\n"
+        "Do not invent facts yourself — always rely on what researcher returned."
     ),
     tools=[
         AgentTool(agent=researcher),
@@ -80,26 +80,26 @@ root_agent = LlmAgent(
 )
 
 
-# --- Альтернатива: классический sub_agents pattern ---
-# Работает, ТОЛЬКО если у sub-агентов НЕТ built-in tools (google_search и т.п.).
-# Раскомментируйте, если хотите попробовать handoff-стиль:
+# --- Alternative: classic sub_agents pattern ---
+# Works ONLY when sub-agents have NO built-in tools (google_search etc.).
+# Uncomment to try the handoff style:
 #
 # researcher_no_search = LlmAgent(
 #     name="researcher",
 #     model=MODEL,
-#     description="Ищет факты (без google_search — генерирует из памяти).",
-#     instruction="Опиши, что ты знаешь по теме, как факты со ссылками.",
+#     description="Looks up facts (no google_search — generates from memory).",
+#     instruction="Describe what you know on the topic, as facts with references.",
 # )
 # root_agent = LlmAgent(
 #     name="research_coordinator",
 #     model=MODEL,
-#     instruction="Делегируй researcher и writer через transfer_to_agent.",
+#     instruction="Delegate to researcher and writer via transfer_to_agent.",
 #     sub_agents=[researcher_no_search, writer],
 # )
 
 
-# --- Пример MCP (закомментирован, требует MCP-сервера) ---
-# Чтобы использовать MCP-сервер (например, filesystem), раскомментируйте:
+# --- MCP example (commented out, requires an MCP server) ---
+# To use an MCP server (e.g., filesystem), uncomment:
 #
 # from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, StdioServerParameters
 #
@@ -113,6 +113,6 @@ root_agent = LlmAgent(
 # root_agent = LlmAgent(
 #     name="file_agent",
 #     model=MODEL,
-#     instruction="Используй filesystem tools для работы с файлами в /tmp.",
+#     instruction="Use filesystem tools to work with files under /tmp.",
 #     tools=[fs_toolset],
 # )

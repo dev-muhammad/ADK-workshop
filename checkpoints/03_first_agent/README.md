@@ -1,66 +1,66 @@
-# Checkpoint 03 · Первый агент: Hello, Agent!
+# Checkpoint 03 · First agent: Hello, Agent!
 
-## Что нового в этом шаге
+## What's new in this step
 
-Это **самый первый** агент. Здесь нет ни инструментов, ни памяти — только LLM и инструкция.
+This is the **very first** agent. No tools, no memory — just an LLM and an instruction.
 
-Добавили:
-- `my_first_agent/__init__.py` — `from . import agent` (обязательно для импорта).
-- `my_first_agent/agent.py` — определение `root_agent` через `Agent(...)`.
-- `my_first_agent/.env.example` — шаблон для GOOGLE_API_KEY.
+Added:
+- `my_first_agent/__init__.py` — `from . import agent` (required for import).
+- `my_first_agent/agent.py` — defines `root_agent` via `Agent(...)`.
+- `my_first_agent/.env.example` — template for GOOGLE_API_KEY.
 
-## Теория
+## Theory
 
-**Что такое агент в ADK?**
-Минимальный агент — это `LlmAgent` (alias `Agent`) с тремя обязательными полями:
+**What is an ADK agent?**
+A minimal agent is an `LlmAgent` (aliased as `Agent`) with three required fields:
 
-- `name` — уникальное имя (используется в логах и multi-agent сценариях).
-- `model` — какой LLM вызывать (`gemini-2.5-flash`, `gemini-2.0-flash`, и т.д.).
-- `instruction` — системный промпт, задающий роль и стиль ответа.
+- `name` — unique identifier (used in logs and multi-agent scenarios).
+- `model` — which LLM to call (`gemini-2.5-flash`, `gemini-2.0-flash`, etc.).
+- `instruction` — the system prompt that sets the role and response style.
 
-**Почему нужна именно эта структура папок?**
-ADK CLI (`adk run`, `adk web`) ищет:
-1. Папку с любым именем (это будет `agent_name` в dev UI).
-2. Внутри неё — `__init__.py` с `from . import agent`.
-3. И `agent.py` с переменной `root_agent`.
+**Why this exact folder structure?**
+ADK CLI (`adk run`, `adk web`) looks for:
+1. Any folder name (this becomes the `agent_name` in dev UI).
+2. Inside it — `__init__.py` with `from . import agent`.
+3. And `agent.py` with a `root_agent` variable.
 
-Если хоть одно нарушить — агент не появится в dropdown'е `adk web`.
+Break any of these and the agent won't show up in the `adk web` dropdown.
 
-**`Agent` vs `LlmAgent`** — это один и тот же класс, `Agent` просто короче.
+**`Agent` vs `LlmAgent`** — same class, `Agent` is just shorter.
 
-## Структура
+## Structure
 
 ```
 03_first_agent/
 └── my_first_agent/
     ├── __init__.py       ← from . import agent
     ├── agent.py          ← root_agent = Agent(...)
-    └── .env.example      ← скопируйте в .env и впишите ключ
+    └── .env.example      ← copy to .env and paste your key
 ```
 
-## Запуск
+## Running
 
 ```bash
-# 1. Скопировать .env.example в .env и вписать GOOGLE_API_KEY
+# 1. Copy .env.example to .env and paste GOOGLE_API_KEY
 cd checkpoints/03_first_agent/my_first_agent
 cp .env.example .env
-# отредактируйте .env: GOOGLE_API_KEY=ваш_ключ
+# edit .env: GOOGLE_API_KEY=your_key
 
-# 2. Перейти в родительскую папку checkpoint'а (важно!)
+# 2. Go up to the checkpoint's parent folder (important!)
 cd ..
 
-# 3. Запустить
-adk web           # dev UI на http://localhost:8000
-# или
-adk run my_first_agent   # терминал
+# 3. Run
+adk web           # dev UI on http://localhost:8000
+# or
+adk run my_first_agent   # terminal
 ```
 
-В dev UI выберите `my_first_agent` в dropdown'е и спросите:
-- «Что такое list comprehension?»
-- «Объясни *args и **kwargs»
+In the dev UI pick `my_first_agent` from the dropdown and ask:
+- "What's a list comprehension?"
+- "Explain *args and **kwargs"
 
-## Что пробовать
+## Things to try
 
-- Поменяйте `instruction` — добавьте «отвечай только на английском» и посмотрите, как агент изменит поведение.
-- Замените `model="gemini-2.5-flash"` на `"gemini-2.0-flash"` и сравните скорость.
-- Спросите агента о погоде — увидите, что без инструментов он отвечает общими словами или признаётся, что не знает.
+- Change `instruction` — add "answer in English only" and observe how behavior shifts.
+- Swap `model="gemini-2.5-flash"` for `"gemini-2.0-flash"` and compare speed.
+- Ask the agent about the weather — you'll see that without tools it gives generic answers or admits it doesn't know.

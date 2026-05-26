@@ -1,66 +1,66 @@
-# Checkpoint 04 · Tools — function tools и встроенный google_search
+# Checkpoint 04 · Tools — function tools and built-in google_search
 
-## Что нового в этом шаге
+## What's new in this step
 
-К базовому агенту добавлены **инструменты** — функции, которые агент может вызывать сам, чтобы получить факты или выполнить действие.
+The base agent gets **tools** — functions the agent can call on its own to fetch facts or perform actions.
 
-Изменили:
-- `agent.py` — две функции `get_weather(city)` и `get_current_time(city)` теперь передаются в `tools=[...]`.
-- В конце файла — закомментированный пример с встроенным `google_search`.
+Changes:
+- `agent.py` — two functions `get_weather(city)` and `get_current_time(city)` passed as `tools=[...]`.
+- At the bottom of the file — a commented-out example with the built-in `google_search`.
 
-## Теория
+## Theory
 
-**Что такое tool в ADK?**
-Любая обычная Python-функция. ADK сам:
-1. Берёт её сигнатуру (имя, параметры, type hints).
-2. Парсит docstring (описание + Args).
-3. Превращает всё это в JSON-схему, которую LLM понимает.
-4. Когда LLM решает вызвать tool — ADK исполняет функцию и подкладывает результат в контекст.
+**What is a tool in ADK?**
+Any plain Python function. ADK:
+1. Reads its signature (name, parameters, type hints).
+2. Parses the docstring (description + Args).
+3. Turns all that into a JSON schema the LLM understands.
+4. When the LLM decides to call a tool — ADK executes the function and feeds the result back into context.
 
-**Почему docstring и type hints критичны:**
-LLM видит только то, что вы написали в docstring и сигнатуре. Если type hint неверный или описания нет — модель будет передавать аргументы неправильно или вообще не вызовет tool.
+**Why docstrings and type hints are critical:**
+The LLM only sees what you wrote in the docstring and signature. Wrong type hints or missing descriptions → the model passes wrong arguments or skips the tool entirely.
 
-**Рекомендуемый паттерн возврата** — `dict` со статусом:
+**Recommended return pattern** — a `dict` with status:
 
 ```python
 {"status": "success", "report": "..."}
 {"status": "error", "error_message": "..."}
 ```
 
-Это позволяет LLM по структуре ответа понять, удалось ли вызвать tool, и красиво обработать ошибку.
+This lets the LLM tell from the shape of the response whether the tool succeeded, and handle errors gracefully.
 
 **Built-in tools:**
-- `google_search` — поиск с grounding в результатах Google.
-- `code_execution` — sandboxed выполнение Python (Gemini 2.0+).
+- `google_search` — search with grounding in Google results.
+- `code_execution` — sandboxed Python execution (Gemini 2.0+).
 
-Их нельзя смешивать с обычными function tools в одном агенте — это ограничение Gemini.
+These cannot be mixed with regular function tools on the same agent — it's a Gemini limitation.
 
-## Структура
+## Structure
 
 ```
 04_tools/
 └── my_first_agent/
     ├── __init__.py
-    ├── agent.py          ← добавлены 2 функции + tools=[...]
+    ├── agent.py          ← +2 functions + tools=[...]
     └── .env.example
 ```
 
-## Запуск
+## Running
 
 ```bash
 cd checkpoints/04_tools
 adk web
 ```
 
-Попробуйте:
-- «Какая погода в Нью-Йорке?» → должен вызвать `get_weather("New York")`
-- «Сколько сейчас времени в Лондоне?» → `get_current_time("London")`
-- «А в Москве?» → агент честно скажет, что данных нет (видит `status: error`)
+Try:
+- "What's the weather in New York?" → should call `get_weather("New York")`
+- "What time is it in London?" → `get_current_time("London")`
+- "And in Moscow?" → agent should honestly say no data is available (sees `status: error`)
 
-В dev UI откройте вкладку **Events** — увидите function call и его аргументы.
+Open the **Events** tab in the dev UI — you'll see the function call and its arguments.
 
-## Что пробовать
+## Things to try
 
-- Добавьте свой tool, например `get_exchange_rate(from_currency, to_currency)` (с заглушкой) и спросите: «во сколько долларов 100 евро?».
-- Раскомментируйте блок с `google_search` (закомментировав основной `root_agent`) и попробуйте «Кто выиграл последний Чемпионат мира по футболу?».
-- Уберите docstring у `get_weather` и посмотрите, как агент перестаёт корректно вызывать функцию.
+- Add your own tool, e.g. `get_exchange_rate(from_currency, to_currency)` (with a stub) and ask: "how many dollars is 100 euros?".
+- Uncomment the `google_search` block (commenting out the main `root_agent`) and try "Who won the most recent FIFA World Cup?".
+- Remove the docstring from `get_weather` and watch the agent stop calling it correctly.

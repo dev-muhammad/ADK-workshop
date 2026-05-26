@@ -1,11 +1,11 @@
-"""Демонстрация SSE streaming.
+"""SSE streaming demonstration.
 
-Что показывает:
-  - StreamingMode.SSE даёт token-by-token поток
-  - event.partial = True для промежуточных чанков
-  - max_llm_calls ограничивает количество вызовов LLM (защита от runaway)
+What it shows:
+  - StreamingMode.SSE produces a token-by-token stream
+  - event.partial = True on intermediate chunks
+  - max_llm_calls limits the number of LLM calls (runaway protection)
 
-Запуск:
+Run:
     cd checkpoints/06_streaming
     python streaming_demo.py
 """
@@ -14,7 +14,7 @@ import asyncio
 
 from dotenv import load_dotenv
 
-# load_dotenv должен идти ДО импорта агента — иначе ADK_MODEL не будет подхвачен.
+# load_dotenv must run BEFORE the agent import — otherwise ADK_MODEL won't be picked up.
 load_dotenv("my_first_agent/.env")
 
 from google.adk.agents.run_config import RunConfig, StreamingMode  # noqa: E402
@@ -35,10 +35,10 @@ async def main() -> None:
 
     run_config = RunConfig(
         streaming_mode=StreamingMode.SSE,
-        max_llm_calls=20,  # защита от бесконечного цикла
+        max_llm_calls=20,  # runaway-loop protection
     )
 
-    print(">>> User: Расскажи длинную историю про кота-программиста.\n")
+    print(">>> User: Tell me a long story about a coding cat.\n")
     print("<<< Agent: ", end="", flush=True)
 
     async for event in runner.run_async(
@@ -46,18 +46,18 @@ async def main() -> None:
         session_id=session.id,
         new_message=types.Content(
             role="user",
-            parts=[types.Part(text="Расскажи длинную историю про кота-программиста.")],
+            parts=[types.Part(text="Tell me a long story about a coding cat.")],
         ),
         run_config=run_config,
     ):
         if event.content and event.content.parts:
             for part in event.content.parts:
                 if part.text:
-                    # Промежуточные чанки (event.partial=True) выводим без переноса,
-                    # финальный — с переносом.
+                    # Intermediate chunks (event.partial=True) print without newline;
+                    # the final one adds a newline.
                     print(part.text, end="", flush=True)
         if event.is_final_response():
-            print()  # перенос строки в конце
+            print()  # newline at the end
 
 
 if __name__ == "__main__":

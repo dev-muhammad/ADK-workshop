@@ -1,31 +1,31 @@
-# Checkpoint 08 · Sub-agents и MCP
+# Checkpoint 08 · Sub-agents and MCP
 
-## Что нового в этом шаге
+## What's new in this step
 
-Перешли от одиночного агента к **multi-agent системе**: координатор делегирует задачи специализированным sub-агентам. Также — концептуальный пример подключения внешних tools через MCP.
+We go from a single agent to a **multi-agent system**: a coordinator delegates tasks to specialized sub-agents. Also — a conceptual example of attaching external tools via MCP.
 
-Изменили:
-- `agent.py` — три агента: `researcher`, `writer` и `coordinator` с `sub_agents=[researcher, writer]`.
-- В комментариях — пример с `MCPToolset` для подключения filesystem MCP-сервера.
+Changes:
+- `agent.py` — three agents: `researcher`, `writer`, and `coordinator` using `AgentTool` (see why below).
+- Commented section — example with `MCPToolset` for connecting a filesystem MCP server.
 
-## Теория
+## Theory
 
-**Зачем нужны sub-agents?**
-Когда задача сложная — единый промпт быстро становится «спагетти». Лучше разбить на специализированных агентов:
+**Why sub-agents?**
+When a task gets complex, a single prompt quickly becomes spaghetti. Better to split into specialized agents:
 
-- У каждого свой узкий `instruction` и набор tools.
-- Координатор сам решает, какому sub-agent передать ход (на основе их `description`).
-- Каждый sub-agent — это полноценный `LlmAgent`, можно вкладывать дальше.
+- Each gets its own narrow `instruction` and tool set.
+- The coordinator decides who to delegate to, based on the sub-agents' `description`.
+- Each sub-agent is a full `LlmAgent` — you can nest further.
 
-**Два типа multi-agent:**
+**Two main types of multi-agent:**
 
-1. **AgentTool pattern** (наш пример) — sub-агенты оборачиваются в `AgentTool` и передаются координатору как обычные tools. Координатор вызывает их через function-calling, получает текстовый результат.
-2. **`sub_agents=[...]` handoff** — классический «передача хода». Координатор делает `transfer_to_agent("researcher")`, контекст переключается на sub-агента, потом возвращается. Гибче, но имеет важное ограничение (см. ниже).
-3. **Workflow agents** — `SequentialAgent`, `ParallelAgent`, `LoopAgent` — детерминированный порядок без LLM на координации. Дешевле и предсказуемее.
+1. **AgentTool pattern** (our example) — sub-agents are wrapped in `AgentTool` and given to the coordinator as regular tools. The coordinator calls them via function-calling, gets a text result.
+2. **`sub_agents=[...]` handoff** — classic "pass the turn". The coordinator calls `transfer_to_agent("researcher")`, context switches to the sub-agent, then returns. More flexible but has a major caveat (see below).
+3. **Workflow agents** — `SequentialAgent`, `ParallelAgent`, `LoopAgent` — deterministic order, no LLM as coordinator. Cheaper and predictable.
 
-### ⚠️ Почему здесь AgentTool, а не sub_agents
+### ⚠️ Why AgentTool here and not sub_agents
 
-Gemini API **не разрешает** смешивать **built-in tools** (`google_search`, `code_execution`) с обычным function-calling в одном агенте. А при `sub_agents=[...]` ADK автоматически инжектит в sub-агента функцию `transfer_to_agent` — что вызывает ошибку:
+The Gemini API **does not allow** mixing **built-in tools** (`google_search`, `code_execution`) with regular function-calling on the same agent. And with `sub_agents=[...]`, ADK auto-injects a `transfer_to_agent` function into each sub-agent — which triggers:
 
 ```
 400 INVALID_ARGUMENT: Please enable
@@ -33,20 +33,20 @@ tool_config.include_server_side_tool_invocations to use
 Built-in tools with Function calling.
 ```
 
-`AgentTool` обходит проблему: sub-агент запускается **в собственном sub-runner'е**, изолированно — никакого `transfer_to_agent` ему не добавляют, `google_search` живёт один.
+`AgentTool` works around this: the sub-agent runs **in its own sub-runner**, in isolation — no `transfer_to_agent` is injected, `google_search` lives alone.
 
-**Когда `sub_agents=[...]` ОК:** если у sub-агентов нет built-in tools (только LLM или function tools).
+**When `sub_agents=[...]` is fine:** if the sub-agents have no built-in tools (LLM only or function tools only).
 
-**Что такое MCP (Model Context Protocol)?**
-Открытый стандарт для подключения внешних tools и данных к AI-агентам — как «USB-C для AI». Один и тот же MCP-сервер можно подключить к ADK, Claude Desktop, Cursor, любому совместимому клиенту.
+**MCP (Model Context Protocol)?**
+An open standard for connecting external tools and data to AI agents — like "USB-C for AI". The same MCP server can be plugged into ADK, Claude Desktop, Cursor, any compatible client.
 
-Готовые MCP-серверы существуют для: filesystem, GitHub, Slack, Notion, Postgres, Stripe и десятков других сервисов. В ADK подключаются через `MCPToolset`:
+Pre-built MCP servers exist for: filesystem, GitHub, Slack, Notion, Postgres, Stripe, and dozens of other services. Wire them into ADK via `MCPToolset`:
 
 ```python
 from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset
 
 mcp_tools = MCPToolset(
-    connection_params=...,   # как запустить MCP-сервер
+    connection_params=...,   # how to launch the MCP server
 )
 
 agent = LlmAgent(
@@ -55,36 +55,36 @@ agent = LlmAgent(
 )
 ```
 
-После этого, не написав ни одной функции, агент получает доступ ко всем tools, которые экспортирует MCP-сервер.
+After that — without writing a single function — your agent has access to every tool the MCP server exposes.
 
-## Структура
+## Structure
 
 ```
 08_sub_agents_mcp/
 └── my_first_agent/
     ├── __init__.py
-    ├── agent.py          ← coordinator + researcher + writer
+    ├── agent.py          ← coordinator + researcher + writer (AgentTool)
     └── .env.example
 ```
 
-## Запуск
+## Running
 
 ```bash
 cd checkpoints/08_sub_agents_mcp
 adk web
 ```
 
-Попробуйте: «Напиши краткую статью про Python decorators.»
+Try: "Write a short article about Python decorators."
 
-В dev UI откройте вкладку **Events** — увидите:
-1. `coordinator` вызывает **tool** `researcher(request=...)` (это AgentTool, не transfer)
-2. Внутри researcher: вызов `google_search`, формирование списка фактов
-3. Результат AgentTool возвращается в coordinator как обычный function-response
-4. `coordinator` вызывает **tool** `writer(facts=...)` — он пишет статью
-5. `coordinator` возвращает финальную статью пользователю
+In the dev UI open the **Events** tab — you'll see:
+1. `coordinator` calls the **tool** `researcher(request=...)` (it's an AgentTool, not a transfer)
+2. Inside researcher: a `google_search` call, then building the list of facts
+3. The AgentTool result is returned to the coordinator as a regular function-response
+4. `coordinator` calls the **tool** `writer(facts=...)` — it writes the article
+5. `coordinator` returns the final article to the user
 
-## Что пробовать
+## Things to try
 
-- Поменяйте `instruction` у `coordinator`: «Сначала всегда дай слово researcher'у, потом writer'у» — посмотрите, насколько модель будет следовать.
-- Замените `LlmAgent` координатора на `SequentialAgent` с `sub_agents=[researcher, writer]` — увидите детерминированный пайплайн.
-- Подключите реальный MCP filesystem-сервер (`npx -y @modelcontextprotocol/server-filesystem /path/to/dir`) и попросите агента прочитать README.md.
+- Change `coordinator`'s `instruction`: "Always give the floor to researcher first, then writer" — observe how closely the model follows.
+- Replace the coordinator `LlmAgent` with a `SequentialAgent` and `sub_agents=[researcher, writer]` — you'll see a deterministic pipeline.
+- Wire up a real filesystem MCP server (`npx -y @modelcontextprotocol/server-filesystem /path/to/dir`) and ask the agent to read README.md.

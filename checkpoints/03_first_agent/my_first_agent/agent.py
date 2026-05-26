@@ -1,30 +1,30 @@
-"""Блок 3. Первый агент: Hello, Agent!
+"""Block 3. First agent: Hello, Agent!
 
-Минимальный рабочий агент ADK — никаких инструментов, только LLM + instruction.
+Minimal working ADK agent — no tools, just LLM + instruction.
 
-Запуск:
+Run:
     cd checkpoints/03_first_agent
-    adk web         # dev UI на http://localhost:8000
-    adk run my_first_agent   # чат в терминале
+    adk web         # dev UI at http://localhost:8000
+    adk run my_first_agent   # chat in terminal
 """
 
 import os
 
-# Имя модели читается из ADK_MODEL (см. .env / .env.example).
-# Fallback на gemini-3.1-flash-lite — у него самый щедрый free-tier RPD (500/день).
+# Model name is read from ADK_MODEL (see .env / .env.example).
+# Falls back to gemini-3.1-flash-lite — the most generous free-tier RPD (500/day).
 MODEL = os.getenv("ADK_MODEL", "gemini-3.1-flash-lite")
 
 from google.adk.agents import Agent
 
-# root_agent — обязательное имя переменной, ADK CLI его ищет автоматически.
+# root_agent — mandatory variable name; ADK CLI looks for it automatically.
 root_agent = Agent(
     name="python_helper",
     model=MODEL,
-    description="Дружелюбный ассистент, помогающий с вопросами по Python.",
+    description="A friendly assistant that helps with Python questions.",
     instruction=(
-        "Ты — дружелюбный наставник по Python. "
-        "Отвечай кратко, по делу и с примерами кода. "
-        "Если вопрос не связан с программированием, "
-        "вежливо переводи разговор обратно к Python."
+        "You are a friendly Python mentor. "
+        "Answer concisely, to the point, with code examples. "
+        "If the question is not about programming, "
+        "politely redirect the conversation back to Python."
     ),
 )

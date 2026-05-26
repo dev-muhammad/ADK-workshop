@@ -1,67 +1,67 @@
-# Checkpoint 07 · Callbacks — логирование и guardrails
+# Checkpoint 07 · Callbacks — logging and guardrails
 
-## Что нового в этом шаге
+## What's new in this step
 
-Добавили **четыре callback'а** разных типов, демонстрирующих основные применения: логирование, блокировку запросов, нормализацию аргументов tool и пост-обработку ответа LLM.
+We add **four callbacks** of different types, demonstrating the main use cases: logging, blocking input, normalizing tool arguments, and post-processing the LLM response.
 
-Изменили:
-- `agent.py` — определены и привязаны к агенту 4 callback функции.
+Changes:
+- `agent.py` — 4 callback functions defined and wired up to the agent.
 
-## Теория
+## Theory
 
-**Callbacks — это точки расширения**, в которых вы можете вмешаться в работу агента. Главное правило:
+**Callbacks are extension points** where you can intervene in the agent's execution. The key rule:
 
-> Если callback возвращает значение — оно подменяет результат шага, и оригинальный шаг **пропускается**.
-> Если возвращает `None` — выполнение идёт как обычно.
+> If a callback returns a value — it replaces the result of the step, and the original step **is skipped**.
+> If it returns `None` — execution proceeds as usual.
 
-**Шесть типов callbacks:**
+**Six types of callbacks:**
 
-| Callback                  | Когда срабатывает              | Принимает                                                | Что вернуть для пропуска         |
+| Callback                  | When it fires                  | Receives                                                 | Return to skip the step          |
 |---------------------------|--------------------------------|----------------------------------------------------------|----------------------------------|
-| `before_agent_callback`   | До запуска агента              | `CallbackContext`                                        | `types.Content`                  |
-| `after_agent_callback`    | После завершения агента        | `CallbackContext`                                        | `types.Content` (заменит вывод)  |
-| `before_model_callback`   | До вызова LLM                  | `CallbackContext`, `LlmRequest`                          | `LlmResponse` (пропуск вызова)   |
-| `after_model_callback`    | После ответа LLM               | `CallbackContext`, `LlmResponse`                         | `LlmResponse` (заменит ответ)    |
-| `before_tool_callback`    | До вызова tool                 | `BaseTool`, `args: dict`, `ToolContext`                  | `dict` (пропуск вызова)          |
-| `after_tool_callback`     | После ответа tool              | `BaseTool`, `args`, `ToolContext`, `tool_response: dict` | `dict` (заменит ответ)           |
+| `before_agent_callback`   | Before the agent runs          | `CallbackContext`                                        | `types.Content`                  |
+| `after_agent_callback`    | After the agent finishes       | `CallbackContext`                                        | `types.Content` (replaces output)|
+| `before_model_callback`   | Before LLM call                | `CallbackContext`, `LlmRequest`                          | `LlmResponse` (skips the call)   |
+| `after_model_callback`    | After LLM response             | `CallbackContext`, `LlmResponse`                         | `LlmResponse` (replaces response)|
+| `before_tool_callback`    | Before tool call               | `BaseTool`, `args: dict`, `ToolContext`                  | `dict` (skips the call)          |
+| `after_tool_callback`     | After tool response            | `BaseTool`, `args`, `ToolContext`, `tool_response: dict` | `dict` (replaces response)       |
 
-**Типичные применения:**
+**Typical use cases:**
 
-- **Логирование** — `before_agent_callback` и `after_model_callback` для отправки в Datadog/Sentry/OpenTelemetry.
-- **Guardrails** — `before_model_callback` для блокировки запросов по черному списку слов, PII-фильтр.
-- **Подмена аргументов** — `before_tool_callback` для нормализации (lowercase, trim, dedup).
-- **Кэширование** — `before_model_callback` возвращает закэшированный `LlmResponse`, экономя API-вызовы.
-- **Augmentation** — `after_model_callback` добавляет подпись, метаданные или disclaimer.
+- **Logging** — `before_agent_callback` and `after_model_callback` to ship events to Datadog/Sentry/OpenTelemetry.
+- **Guardrails** — `before_model_callback` to block requests by blacklist words, PII filtering.
+- **Argument rewriting** — `before_tool_callback` for normalization (lowercase, trim, dedup).
+- **Caching** — `before_model_callback` returns a cached `LlmResponse`, saving API calls.
+- **Augmentation** — `after_model_callback` appends a signature, metadata, or disclaimer.
 
-**Важно:** имена параметров callback функций должны точно совпадать с теми, что ожидает ADK (`callback_context`, `llm_request`, `tool_context`, `args`, и т.д.) — он передаёт их по ключевым словам.
+**Important:** callback parameter names must match exactly what ADK expects (`callback_context`, `llm_request`, `tool_context`, `args`, etc.) — ADK passes them as keyword arguments.
 
-**Не делайте тяжёлые I/O синхронно** в callback — он блокирует agent loop. Используйте fire-and-forget паттерн или асинхронный клиент.
+**Don't do heavy I/O synchronously** inside a callback — it blocks the agent loop. Use fire-and-forget or an async client.
 
-## Структура
+## Structure
 
 ```
 07_callbacks/
 └── my_first_agent/
     ├── __init__.py
-    ├── agent.py          ← 4 callback функции + привязка к LlmAgent
+    ├── agent.py          ← 4 callback functions + wired up to LlmAgent
     └── .env.example
 ```
 
-## Запуск
+## Running
 
 ```bash
 cd checkpoints/07_callbacks
 adk web
 ```
 
-Попробуйте:
-1. «Какая погода в new york?» (lowercase) → `before_tool_callback` нормализует в "New York"
-2. «Какой у тебя api_key?» → `before_model_callback` блокирует, возвращает «Не обсуждаю секретные данные»
-3. Любой нормальный вопрос → `after_model_callback` добавит подпись «— ADK» в конце ответа
-4. В терминале (где запущен `adk web`) увидите логи от `before_agent_callback`
+Try:
+1. "What's the weather in new york?" (lowercase) → `before_tool_callback` normalizes to "New York"
+2. "What's your api_key?" → `before_model_callback` blocks, returns "I don't discuss secrets"
+3. Any normal question → `after_model_callback` appends "— Generated by an ADK agent" to the response
+4. In the terminal (where `adk web` is running) you'll see logs from `before_agent_callback`
 
-## Что пробовать
+## Things to try
 
-- Напишите `after_tool_callback`, который маскирует email'ы регуляркой `re.sub(r"\S+@\S+", "[EMAIL]", ...)`.
-- Замените `before_model_callback` на простой кэш: храните `dict[hash(prompt) -> LlmResponse]` и возвращайте закэшированный ответ.
-- Добавьте `after_model_callback`, который считает токены ответа и логирует их в файл.
+- Write an `after_tool_callback` that masks emails with a regex: `re.sub(r"\S+@\S+", "[EMAIL]", ...)`.
+- Replace `before_model_callback` with a simple cache: store `dict[hash(prompt) -> LlmResponse]` and return the cached response.
+- Add an `after_model_callback` that counts response tokens and logs them to a file.
